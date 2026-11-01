@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esposito HI-RES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script type="module" src="app.js"></script>
+</head>
+<body>
+
+<div id="shell">
+  
+  <!-- TITLEBAR -->
+  <div id="titlebar">
+
+  <div class="tb-left">
+    <div class="tb-logo">
+      <span class="logo-mark">E</span>
+      <span class="logo-text">Esposito HI-FI</span>
+    </div>
+    <div class="tb-divider"></div>
+    <div class="titlebar-nav">
+      <button class="titlebar-btn" onclick="window.app.toggleSidebar()" title="Toggle Sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="tb-center">
+    <!-- GRUPPO FRECCE — spostato qui, accanto alla search -->
+    <div class="nav-history">
+      <button id="btn-back" class="titlebar-btn" onclick="window.app.goBack()" title="Back" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button id="btn-forward" class="titlebar-btn" onclick="window.app.goForward()" title="Forward" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    
+    <!--SEARCH BAR-->
+    <div class="search-wrap" style="position:relative; display:flex; align-items:center;">
+      <span class="search-icon">⌕</span>
+      <input id="titlebar-search" type="text" autocomplete="off"
+        placeholder="Search artists, albums, tracks…"
+        onfocus="window.app.onSearchFocus()"
+        oninput="window.app.onSearchInput(this.value)"
+        onkeydown="if(event.key==='Enter'){window.app._doSearch(this.value);this.blur();}">
+      
+      <button id="close-search-btn" style="display:none; background:none; border:none; color:var(--text3); cursor:pointer; font-size:16px; padding:0 8px; position:absolute; right:15px;" onclick="window.app.closeSearch()">✕</button>
+    </div>
+
+
+  </div>
+
+  <div class="tb-right">
+    <div class="titlebar-actions">
+      <!--button class="titlebar-btn" onclick="window.app.toggleQueue()" title="Queue (Q)">☰</button>
+      <button class="titlebar-btn" onclick="window.app.toggleFullscreen()" title="Now Playing (F)">⛶</button-->
+    </div>
+    <div class="win-controls" id="win-controls">
+      <button class="win-btn win-min" id="win-min" title="Minimize">
+        <svg viewBox="0 0 12 12" width="12" height="12"><rect y="5.5" width="12" height="1" fill="currentColor"/></svg>
+      </button>
+      <button class="win-btn win-max" id="win-max" title="Maximize">
+        <svg viewBox="0 0 12 12" width="12" height="12"><rect x="0.5" y="0.5" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+      <button class="win-btn win-close" id="win-close" title="Close">
+        <svg viewBox="0 0 12 12" width="12" height="12"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div id="main-area">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Discover</span>
+        <div class="nav-item" data-view="home" onclick="window.app.navigate('home')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Home
+        </div>
+        <div class="nav-item" data-view="new-releases" onclick="window.app.navigate('new-releases')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          New Releases
+        </div>
+        <div class="nav-item" data-view="featured" onclick="window.app.navigate('featured')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Featured
+        </div>
+        <div class="nav-item" data-view="most-streamed" onclick="window.app.navigate('most-streamed')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12a8 8 0 0 1 16 0" />
+            <rect x="3" y="12" width="4" height="7" rx="2" />
+            <rect x="17" y="12" width="4" height="7" rx="2" />
+          </svg>
+          Most Streamed
+        </div>
+      </div>
+
+      <!--div class="sidebar-section">
+        <span class="sidebar-label">Library</span>
+        <div class="nav-item" data-view="fav-tracks" onclick="window.app.navigate('fav-tracks')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Liked Songs
+        </div>
+        <div class="nav-item" data-view="fav-albums" onclick="window.app.navigate('fav-albums')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+          Saved Albums
+        </div>
+        <div class="nav-item" data-view="fav-artists" onclick="window.app.navigate('fav-artists')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Followed Artists
+        </div>
+        <div class="nav-item" data-view="playlists" onclick="window.app.navigate('playlists')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Playlists
+        </div>
+      </div-->
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">App</span>
+        <div class="nav-item" data-view="settings" onclick="window.app.navigate('settings')">
+         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Settings
+        </div>
+        
+        <div class="nav-item" data-view="user-expire" onclick="window.app.navigate('user-expire')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          User Info
+        </div>
+
+      </div>
+
+      <div class="sidebar-section" style="padding-top:8px;">
+        <span class="sidebar-label">Playlists</span>
+		
+		<!-- BUTTON APPLE MUSIC -->
+		<div class="nav-item" onclick="window.appleImporter.showModal()" data-no-close style="color: #fa243c; font-weight: 500; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+		  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+			<path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.5 1.3 0 2.55.88 3.35.88.8 0 2.27-.88 3.81-.75 1.29.05 2.45.52 3.19 1.41-2.92 1.5-2.44 5.39.51 6.63a6.8 6.8 0 0 1-1 4.44zM13 3.5c.75.83 1.3 1.77 1.05 3.23-1.08.08-2.38-.63-2.98-1.51-.61-.89-.53-2.22.75-3.13 1.01-.1 2.05.49 1.18 1.41z"/>
+		  </svg>
+			Import from Apple Music
+		</div>
+
+
+    <!-- IMPORTA DA FILE LOCALE--> 
+    <div class="nav-item" onclick="document.getElementById('local-file-input').click()" data-no-close style="color: #4FC3F7; font-weight: 500; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Import Local Files
+    </div>
+    <!-- Input file nascosto -->
+    <input type="file" id="local-file-input" multiple accept="audio/*" style="display: none;" onchange="window.app.importLocalFiles(event)">
+
+		
+        <div id="sidebar-playlists"></div>
+      </div>
+    </nav>
+
+
+    <!-- CONTENT -->
+    <div id="content">
+
+      <!-- HOME -->
+      <div id="view-home" class="view view-padded active">
+        <div id="home-hero"></div>
+        <div class="section-hdr"><span class="section-title">New Releases</span><span class="section-more" onclick="window.app.navigate('new-releases')">See all →</span></div>
+        <div id="home-nr"></div>
+        <div class="section-hdr"><span class="section-title">Editor's Picks</span><span class="section-more" onclick="window.app.navigate('featured')">See all →</span></div>
+        <div id="home-ep"></div>
+        <div class="section-hdr"><span class="section-title">Most Streamed</span><span class="section-more" onclick="window.app.navigate('most-streamed')">See all →</span></div>
+        <div id="home-ms"></div>
+      </div>
+
+      <!-- FEATURED -->
+      <div id="view-featured" class="view view-padded">
+        <div class="page-title">Featured</div>
+        <div class="page-subtitle" style="margin-bottom:28px;">Curated by Qobuz editors</div>
+        <div class="section-hdr"><span class="section-title">Editor's Picks</span></div>
+        <div id="feat-editor"></div>
+        <div class="section-hdr"><span class="section-title">Best Sellers</span></div>
+        <div id="feat-bestsellers"></div>
+        <!--div class="section-hdr"><span class="section-title">Press Awards</span></div>
+        <div id="feat-press"></div>
+        <div class="section-hdr"><span class="section-title">Most Streamed</span></div>
+        <div id="feat-streamed"></div-->
+      </div>
+      
+      <!-- MOST STREAMED -->
+      <div id="view-most-streamed" class="view view-padded">
+        <div class="page-title">Most Streamed</div>
+        <div class="page-subtitle" style="margin-bottom:28px;"></div>
+        <div id="most-streamed-grid"></div>
+      </div>
+
+      <!-- NEW RELEASES -->
+      <div id="view-new-releases" class="view view-padded">
+        <div class="page-title">New Releases</div>
+        <div class="page-subtitle" style="margin-bottom:28px;">Latest additions</div>
+        <div id="new-releases-grid"></div>
+      </div>
+
+      <!-- SEARCH -->
+      <div id="view-search" class="view view-padded">
+        <div class="page-title" style="margin-bottom:18px;">Search</div>
+        <div class="search-tabs">
+          <button class="search-tab active" data-tab="all" onclick="window.app.setSearchTab('all')">All</button>
+          <button class="search-tab" data-tab="tracks" onclick="window.app.setSearchTab('tracks')">Tracks</button>
+          <button class="search-tab" data-tab="albums" onclick="window.app.setSearchTab('albums')">Albums</button>
+          <button class="search-tab" data-tab="artists" onclick="window.app.setSearchTab('artists')">Artists</button>
+        </div>
+        <div id="search-results"></div>
+      </div>
+
+      <!-- ALBUM DETAIL -->
+      <div id="view-album" class="view">
+        <div id="album-hero-wrap"></div>
+        <div class="view-padded" style="padding-top:20px;">
+          <div class="tracklist" id="album-tracks"></div>
+          <div id="album-similar" style="margin-top:32px;"></div>
+        </div>
+      </div>
+
+      <!-- ARTIST DETAIL -->
+      <div id="view-artist" class="view">
+        <div id="artist-hero-wrap"></div>
+        <div class="view-padded" style="padding-top:20px;">
+          <div id="artist-top-section">
+            <div class="section-hdr"><span class="section-title">Popular Tracks</span></div>
+            <div class="tracklist" id="artist-top-tracks"></div>
+          </div>
+          <div id="artist-albums-section">
+            <div class="section-hdr"><span class="section-title">Albums</span></div>
+            <div id="artist-albums"></div>
+          </div>
+          <div id="artist-eps-section" style="display:none;">
+            <div class="section-hdr"><span class="section-title">EPs</span></div>
+            <div id="artist-eps"></div>
+          </div>
+          <div id="artist-singles-section" style="display:none;">
+            <div class="section-hdr"><span class="section-title">Singles</span></div>
+            <div id="artist-singles"></div>
+          </div>
+          <div id="artist-appearances-section" style="display:none;">
+            <div class="section-hdr"><span class="section-title">Appears On</span></div>
+            <div id="artist-appearances"></div>
+          </div>
+          <div id="artist-similar" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- PLAYLIST DETAIL -->
+      <div id="view-playlist" class="view">
+        <div id="playlist-hero-wrap"></div>
+        <div class="view-padded" style="padding-top:20px;">
+          
+          <!-- Barra di ricerca -->
+          <div class="search-wrap" style="margin-bottom: 24px; max-width: 400px;">
+            <span class="search-icon">⌕</span>
+            <input id="playlist-search" type="text" autocomplete="off"
+              placeholder="Search songs in the playlist..."
+              oninput="window.app.filterPlaylist(this.value)"
+              style="width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text1); padding: 10px 14px 10px 36px; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box;">
+          </div>
+
+          <div class="tracklist" id="playlist-tracks"></div>
+        </div>
+      </div>
+
+      <!-- LIKED SONGS -->
+      <div id="view-fav-tracks" class="view view-padded">
+        <div class="page-title" style="margin-bottom:24px;">Liked Songs</div>
+        <div class="tracklist" id="fav-tracks-list"></div>
+      </div>
+
+      <!-- SAVED ALBUMS -->
+      <div id="view-fav-albums" class="view view-padded">
+        <div class="page-title" style="margin-bottom:24px;">Saved Albums</div>
+        <div id="fav-albums-grid"></div>
+      </div>
+
+      <!-- FOLLOWED ARTISTS -->
+      <div id="view-fav-artists" class="view view-padded">
+        <div class="page-title" style="margin-bottom:24px;">Followed Artists</div>
+        <div id="fav-artists-grid"></div>
+      </div>
+
+      <!-- PLAYLISTS -->
+      <div id="view-playlists" class="view view-padded">
+        <div class="page-title" style="margin-bottom:24px;">Playlists</div>
+        <div id="playlists-grid"></div>
+      </div>
+
+      <!--USER INFO-->
+      <div id="view-user-expire" class="view view-padded">
+        <div class="page-title" style="display: flex; justify-content: center; align-items: center;color: blue;">Account Subscription Info</div>
+        <br>
+        <div id="user-expire" style="display: flex; justify-content: center; align-items: center;font-size: 25px; color: brown;">
+          </div>
+      </div>
+
+      <!-- STANDARD LYRICS VIEW -->
+      <div id="view-lyrics" class="view view-padded">
+        <div class="page-title" style="margin-bottom:10px;"></div>
+        
+        <!-- Contenitore dedicato per i testi nella UI standard -->
+        <div id="standard-lyrics-container" class="lyrics-container" style="max-width: 800px; margin: 0 auto; height: calc(100vh - 200px); overflow-y: auto; padding-bottom: 250px; padding-top: 30px;">
+          <div class="lyric-line" style="opacity:0.5;">No songs playing</div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="view-settings" class="view view-padded">
+        <div class="page-title" style="margin-bottom:28px;">Settings</div>
+        <div class="settings-grid">
+
+          <div class="settings-group">
+            <div class="settings-group-title">Audio Quality</div>
+            <div class="settings-row">
+              <div><div class="settings-row-label">Streaming Quality</div>
+                <div class="settings-row-desc">Format used during playback</div></div>
+              <div style="display:flex;gap:4px;">
+                <button class="quality-btn quality-btn-settings" data-q="5" onclick="window.app.setSetting('quality','5')">MP3</button>
+                <button class="quality-btn quality-btn-settings" data-q="6" onclick="window.app.setSetting('quality','6')">LOSSLESS</button>
+                <button class="quality-btn quality-btn-settings" data-q="7" onclick="window.app.setSetting('quality','7')">24bit</button>
+                <button class="quality-btn quality-btn-settings" data-q="27" onclick="window.app.setSetting('quality','27')">Hi-Res</button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-row-label">Download Quality</div>
+                <div class="settings-row-desc">Format used for downloads</div></div>
+              <div style="display:flex;gap:4px;">
+                <button class="quality-btn quality-btn-dl" data-q="5" onclick="window.app.setSetting('downloadQuality','5')">MP3</button>
+                <button class="quality-btn quality-btn-dl" data-q="6" onclick="window.app.setSetting('downloadQuality','6')">LOSSLESS</button>
+                <button class="quality-btn quality-btn-dl" data-q="7" onclick="window.app.setSetting('downloadQuality','7')">24bit</button>
+                <button class="quality-btn quality-btn-dl" data-q="27" onclick="window.app.setSetting('downloadQuality','27')">Hi-Res</button>
+              </div>
+            </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">
+                    Cache Apple music
+                    <span id="cache-media-badge" class="cache-badge">—</span>
+                  </div>
+                  <div class="settings-row-desc">Apple Animated covers link and Apple items id</div>
+                </div>
+                <button class="btn btn-ghost" style="color: var(--red); border-color: rgba(192,57,43,.4);" onclick="window.app.clearMediaCache()">Clear Now</button>
+              </div>
+              
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">
+                    System Cache
+                    <span id="cache-normal-badge" class="cache-badge">—</span>
+                  </div>
+                  <div class="settings-row-desc">Settings, saved queues and system data.</div>
+                </div>
+              </div>
+          </div>
+
+          <!--div class="settings-group">
+            <div class="settings-group-title">Playback</div>
+            <div class="settings-row">
+              <div><div class="settings-row-label">Gapless Playback</div>
+                <div class="settings-row-desc">No silence between tracks</div></div>
+              <button class="toggle settings-toggle" data-key="gapless" onclick="window.app.toggleSetting('gapless')"></button>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-row-label">Crossfade</div>
+                <div class="settings-row-desc">Smooth transition between tracks</div></div>
+              <button class="toggle settings-toggle" data-key="crossfade" onclick="window.app.toggleSetting('crossfade')"></button>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-row-label">Autoplay Similar</div>
+                <div class="settings-row-desc">Continue with similar content</div></div>
+              <button class="toggle settings-toggle" data-key="autoplay" onclick="window.app.toggleSetting('autoplay')"></button>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-row-label">Normalize Volume</div>
+                <div class="settings-row-desc">Equalize loudness between tracks</div></div>
+              <button class="toggle settings-toggle" data-key="normalize" onclick="window.app.toggleSetting('normalize')"></button>
+            </div>
+          </div-->
+
+
+          <div class="settings-group">
+            <div class="settings-group-title">System</div>
+
+            <div class="settings-row" style="align-items: flex-start;">
+              <div style="width: 100%;">
+                <div class="settings-row-label">Keyboard Shortcuts</div>
+                <div class="settings-row-desc" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; color: var(--text2);">
+                  <div><strong>Space</strong>: Play / Pause</div>
+                  <div><strong>Ctrl + ← / →</strong>: Prev / Next Track</div>
+                  <div><strong>↑ / ↓</strong>: Volume Up / Down</div>
+                  <div><strong>F</strong>: Toggle Full Screen</div>
+                  <div><strong>Q</strong>: Toggle Queue</div>
+                  <div><strong>M</strong>: Toggle Mute</div>
+                  <div><strong>S</strong>: Toggle Shuffle</div>
+                  <div><strong>T</strong>: Show/Close Lyric</div>
+                  <div><strong>Esc</strong>: Close Full Screen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+         <div class="settings-group">
+            <div class="settings-group-title">Interface</div>
+            
+            <div class="settings-row">
+              <div><div class="settings-row-label">Animated Covers</div>
+                <div class="settings-row-desc">Show animated Apple Music artwork</div></div>
+              <button class="toggle settings-toggle" data-key="animatedCovers" onclick="window.app.toggleSetting('animatedCovers')"></button>
+            </div>
+            
+            <div class="settings-row">
+              <div><div class="settings-row-label">Animations</div>
+                <div class="settings-row-desc">Enable UI animations & transitions</div></div>
+              <button class="toggle settings-toggle" data-key="animationsEnabled" onclick="window.app.toggleSetting('animationsEnabled')"></button>
+            </div>
+            
+            <div class="settings-row">
+              <div><div class="settings-row-label">Show Explicit Badges</div>
+                <div class="settings-row-desc">Mark tracks with explicit content</div></div>
+              <button class="toggle settings-toggle" data-key="explicitContent" onclick="window.app.toggleSetting('explicitContent')"></button>
+            </div>
+            
+            <div class="settings-row">
+              <div><div class="settings-row-label">Track Numbers</div>
+                <div class="settings-row-desc">Show numbers in album view</div></div>
+              <button class="toggle settings-toggle" data-key="showTrackNumbers" onclick="window.app.toggleSetting('showTrackNumbers')"></button>
+            </div>
+
+            <div class="settings-row">
+              <div><div class="settings-row-label">Dynamic Color</div>
+                <div class="settings-row-desc">Extract colors from cover during playback</div></div>
+              <button class="toggle settings-toggle" data-key="dynamicColor" onclick="window.app.toggleSetting('dynamicColor')"></button>
+            </div>
+
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">Connection</div>
+
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Qobuz Account</div>
+                <div class="settings-row-desc">Exit</div>
+              </div>
+              <button class="btn btn-ghost" style="color: var(--red); border-color: rgba(192,57,43,.4);" onclick="window.app.doLogout()">Logout</button>
+            </div>
+			
+			<!-- Discord funcition -->
+			<div class="settings-row">
+              <div><div class="settings-row-label">Discord Rich Presence</div>
+                <div class="settings-row-desc">Show your friends on Discord what you're listening to (Desktop App only).</div></div>
+                <button class="toggle settings-toggle" data-key="discordRPC" onclick="window.app.toggleSetting('discordRPC')"></button>
+              </div>
+			
+			
+            <!--div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:12px;">
+
+              <div style="width: 100%;">
+                <div class="settings-row-label">API Base URL</div>
+                <div class="settings-row-desc">Set the backend server instance used for data fetching.</div>
+              </div>
+
+              <div class="settings-api-row" style="width: 100%; display: flex; gap: 8px;">
+                <input id="settings-api-input" type="text" 
+                placeholder="Insert Api Url" 
+                style="flex: 1; background: var(--bg2); border: 1px solid var(--border); color: var(--text1); padding: 8px 12px; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box;">
+                <button class="btn-sm" style="padding: 8px 16px; border-radius: 8px;" onclick="window.app.updateApiUrl()">Save</button>
+              </div>
+
+              <div class="settings-row-desc" style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+                <span style="font-size: 14px; color: var(--text2);">Current API Instance:</span>
+                <span id="settings-api-url"></span>
+              </div>
+            </div-->
+          </div>
+
+          </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- QUEUE PANEL -->
+    <div id="queue-panel">
+      <div class="queue-header">
+        <span class="queue-header-title">Play Queue</span>
+        <button class="queue-close" onclick="window.app.toggleQueue()">✕</button>
+      </div>
+      <div id="queue-list"></div>
+    </div>
+
+  </div><!-- /main-area -->
+
+  <!-- PLAYER BAR -->
+  <div id="player-bar">
+    <!-- MINI PLAYER -->
+      <div id="mini-bar">
+        <div id="mini-drag-strip">
+          <div class="mini-drag-handle"></div>
+        </div>
+        <!-- Cover con video animato -->
+        <div id="mini-art-wrap">
+          <div id="mini-art"></div>
+          <video id="mini-video-art" autoplay loop muted playsinline crossorigin="anonymous"></video>
+          <div id="mini-art-overlay">
+            <button class="mini-overlay-btn" onclick="window.player.prev()">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+            <button class="mini-overlay-play" id="mini-play-btn" onclick="window.player.togglePlay()">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="mini-overlay-btn" onclick="window.player.next()">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- Info testo -->
+        <div id="mini-info">
+          <div id="mini-title"></div>
+          <div id="mini-artist"></div>
+        </div>
+        <!-- Controlli bottom -->
+        <div id="mini-controls">
+          <button class="mini-ctrl" onclick="window.player.prev()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button class="mini-play" id="mini-play-btn-bar" onclick="window.player.togglePlay()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><polygon points="5,3 19,12 5,21"/></svg>
+          </button>
+          <button class="mini-ctrl" onclick="window.player.next()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button class="mini-ctrl mini-expand-btn" onclick="window.app.toggleMiniMode()" title="Espandi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" stroke-linecap="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+        </div>
+        <div id="mini-seek">
+          <div id="mini-seek-fill"></div>
+        </div>
+      </div>
+    
+
+    <div class="player-inner">
+      
+      <div class="now-playing">
+        <div id="now-art" onclick="window.app.toggleFullscreen()">
+          <div class="now-art-placeholder">♪</div>
+        </div>
+        
+        <div class="now-info">
+          <div class="now-title-wrap">
+            <div id="now-title">No track playing</div>
+          </div>
+          <div id="now-artist"></div>
+		  <div id="now-specs"></div>
+        </div>
+        
+        <div class="now-actions">
+          <!--button class="now-action-btn" id="like-btn" onclick="this.classList.toggle('liked')" title="Like">♡</button-->
+          <button class="now-action-btn" onclick="event.stopPropagation(); if(window.player.currentTrack) window.app.showTrackMenu(event, window.player.currentTrack, window.player.queueIdx, window.player.queue)" title="More">⋯</button>
+          <button class="now-action-btn" onclick="if(window.player.currentTrack) window.app.showAddToPlaylist(window.player.currentTrack)" title="Add to Playlist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="player-controls">
+        <div class="ctrl-btns">
+          <button class="ctrl-btn" id="shuffle-btn" title="Shuffle (S)" onclick="window.player.toggleShuffle()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15">
+              <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+              <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+            </svg>
+          </button>
+          <button class="ctrl-btn" title="Previous (Ctrl+←)" onclick="window.player.prev()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button id="play-btn" title="Play/Pause (Space)" onclick="window.player.togglePlay()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><polygon points="5,3 19,12 5,21"/></svg>
+          </button>
+          <button class="ctrl-btn" title="Next (Ctrl+→)" onclick="window.player.next()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button class="ctrl-btn" id="repeat-btn" title="Repeat" onclick="window.player.toggleRepeat()">↩</button>
+          <button class="ctrl-btn" id="mini-mode-btn" onclick="window.app.toggleMiniMode()" title="Mini Player">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="13" width="18" height="8" rx="2"/>
+              <line x1="3" y1="9" x2="10" y2="9"/><line x1="3" y1="6" x2="8" y2="6"/>
+            </svg>
+          </button>
+          
+          <button class="ctrl-btn" id="full_screen" style="font-size: 20px;" onclick="window.app.toggleFullscreen()" title="Full Screen Mode (F)">⛶</button>
+          
+        </div>
+        <div class="seekbar-area">
+          <span class="time-label" id="current-time">0:00</span>
+          <div id="seekbar-track">
+            <div id="seekbar-fill" style="width:0%"></div>
+            <div id="seekbar-thumb" style="left:0%"></div>
+          </div>
+          <span class="time-label end" id="total-time">0:00</span>
+        </div>
+      </div>
+
+      <!-- Extras -->
+      <div class="player-extras">
+
+        <div class="extras-buttons-wrapper" style="display: flex; align-items: center; gap: 2px;">
+    
+          <button class="fs-ctrl-btn" style="padding: 6px;" id="player-lyrics-btn" title="Lyric (T)" 
+            onclick="window.app.toggleLyricsView()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          </button>
+          
+          <button class="fs-ctrl-btn" style="width: 33px; height: 33px; padding: 0; margin-right: 6px; font-size: 20px;" id="queue_btn" onclick="window.app.toggleQueue()" title="Queue (Q)">☰</button>
+        
+        </div>
+         
+        <!--div class="quality-picker" id="quality-picker">
+          <button class="quality-picker-btn quality-dropdown" id="quality-picker-btn" onclick="window.app.toggleQualityPicker(event)">
+            <span id="quality-picker-label">HI-RES</span>
+          </button>
+          <div class="quality-picker-menu" id="quality-picker-menu">
+            <button class="quality-picker-opt" data-q="5"  onclick="window.app.setQuality('5');  window.app.closeQualityPicker()">MP3</button>
+            <button class="quality-picker-opt" data-q="6"  onclick="window.app.setQuality('6');  window.app.closeQualityPicker()">LOSSLESS</button>
+            <button class="quality-picker-opt" data-q="7"  onclick="window.app.setQuality('7');  window.app.closeQualityPicker()">24BIT</button>
+            <button class="quality-picker-opt" data-q="27" onclick="window.app.setQuality('27'); window.app.closeQualityPicker()">HI-RES</button>
+          </div>
+        </div-->
+
+        <div class="vol-area">
+          <button class="vol-btn" onclick="window.player.toggleMute()" title="Mute (M)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </button>
+          <div id="vol-track">
+			<div id="vol-fill"></div>
+			<div id="vol-thumb" style="left: 100%;"></div>
+		  </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay" style="display: none;">
+  <form class="login-box" onsubmit="event.preventDefault(); window.app.doLogin();">
+    <h2 style="margin-bottom: 24px; color: var(--gold); text-align: center; font-weight: 500;">Qobuz Authentication</h2>
+    
+    <div style="margin-bottom: 14px;">
+      <label style="display:block; margin-bottom:6px; font-size:12px; color:var(--text2);">App ID</label>
+      <input type="text" id="login-app-id" class="login-input" placeholder="es. 312369995" autocomplete="off" required>
+    </div>
+    
+    <div style="margin-bottom: 14px;">
+      <label style="display:block; margin-bottom:6px; font-size:12px; color:var(--text2);">App Secret</label>
+      <input type="text" id="login-app-secret" class="login-input" placeholder="es. e79f8b9be..." autocomplete="off" required>
+    </div>
+    
+    <div style="margin-bottom: 28px;">
+      <label style="display:block; margin-bottom:6px; font-size:12px; color:var(--text2);">User Auth Token</label>
+      <input type="password" id="login-user-token" class="login-input" placeholder="es. BRi6z1Cr33TQr..." autocomplete="off" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;">Login</button>
+  </form>
+</div>
+
+
+
+<!-- FULLSCREEN OVERLAY -->
+<div id="fullscreen-overlay">
+  <div id="fs-bg"></div>
+  <button class="fs-close" onclick="window.app.closeFullscreen()" title="Close">✕</button>
+  
+  <div id="fs-content-wrap">
+    
+    <div id="fs-art"><div class="fs-art-placeholder">♪</div></div>
+    
+    <div id="fs-lyrics" class="lyrics-container" style="display: none;">
+        <div class="lyric-line">Lyrics not available</div>
+    </div>
+    
+    <div class="fs-player-ui">
+      
+      <div class="fs-text-content">
+        <div class="fs-title-wrap">
+          <div id="fs-title">—</div>
+        </div>
+        <div class="fs-meta-links">
+          <span id="fs-artist">—</span>
+          <span class="fs-dot" style="display:none;">•</span>
+          <span id="fs-album">—</span>
+        </div>
+        <div class="fs-tech-info">
+          <div id="fs-quality-label"></div>
+          <div id="fs-specs"></div>
+          
+        </div>
+      </div>
+      <div class="fs-bottom-section">
+        <div class="fs-seek-area">
+          <div id="fs-seekbar-track">
+            <div id="fs-seekbar-fill" style="width:0%"></div>
+            <div id="fs-seekbar-thumb" style="left:0%"></div>
+          </div>
+          <div class="fs-times">
+            <span class="fs-time" id="fs-current-time">0:00</span>
+            <span class="fs-time" id="fs-total-time">0:00</span>
+          </div>
+        </div>
+
+        <div class="fs-controls">
+          <button class="fs-ctrl-btn" id="fs-shuffle-btn" title="Shuffle" onclick="window.player.toggleShuffle()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+          </button>
+          
+          <button class="fs-ctrl-btn" onclick="window.player.prev()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          
+          <button id="fs-play-btn" onclick="window.player.togglePlay()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><polygon points="5,3 19,12 5,21"/></svg>
+          </button>
+          
+          <button class="fs-ctrl-btn" onclick="window.player.next()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          
+          <button class="fs-ctrl-btn" id="fs-repeat-btn" title="Repeat" onclick="window.player.toggleRepeat()">↩</button>
+
+          <span class="fs-ctrl-divider"></span>
+
+          <button class="fs-ctrl-btn fs-ctrl-sm" id="fs-lyrics-btn" title="Lyrics" 
+            onclick="document.getElementById('fs-content-wrap').classList.toggle('show-lyrics'); this.classList.toggle('active')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          </button>
+
+          <button id="fs-more-btn" class="fs-ctrl-btn fs-ctrl-sm" title="More options">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+            </svg>
+          </button>
+        </div>
+
+      <div class="fs-vol-area">
+        <button class="fs-vol-btn" onclick="window.player.toggleMute()" title="Mute (M)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </button>
+        <div id="fs-vol-track">
+          <div id="fs-vol-fill"></div>
+          <div id="fs-vol-thumb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Boot
+document.addEventListener('DOMContentLoaded', () => {
+  // Small delay to let modules load
+  setTimeout(() => {
+    if (window.app) window.app.init();
+  }, 100);
+});
+</script>
+
+
+<script>
+  // Funzione globale per il bottone Lyrics
+  window.toggleLyricsMode = function() {
+    const wrap = document.getElementById('fs-content-wrap');
+    const btn = document.getElementById('fs-lyrics-btn');
+    
+    // Toggle della classe sul contenitore
+    wrap.classList.toggle('show-lyrics');
+    
+    // Toggle stato attivo del bottone (per colorarlo d'oro)
+    btn.classList.toggle('active');
+
+    // (Opzionale) Se attivi i testi, scorri subito alla riga attiva
+    if(wrap.classList.contains('show-lyrics')) {
+       const activeLine = document.querySelector('.lyric-line.active');
+       if(activeLine) activeLine.scrollIntoView({behavior: "smooth", block: "center"});
+    }
+  };
+</script>
+
+
+<script>
+  // Chiudi sidebar al click (ma non per il bottone "New Playlist")
+  document.getElementById('sidebar').addEventListener('click', (e) => {
+    const item = e.target.closest('.nav-item');
+    if (item && !item.hasAttribute('data-no-close')) {
+       window.app.toggleSidebar(); 
+    }
+  });
+</script>
+
+
+<script>
+// Electron window controls
+(function() {
+  if (!window.electronAPI) return;
+  const api = window.electronAPI;
+
+  document.getElementById('win-controls').style.display = 'flex';
+  document.getElementById('win-min').addEventListener('click', () => api.minimize());
+  document.getElementById('win-max').addEventListener('click', () => api.maximize());
+  document.getElementById('win-close').addEventListener('click', () => api.close());
+
+  // macOS: hide win controls (uses native traffic lights via titleBarStyle hidden)
+  if (api.platform === 'darwin') {
+    document.getElementById('win-controls').style.display = 'none';
+    // Add macOS traffic-light spacer on the left
+    document.getElementById('titlebar').classList.add('macos-titlebar');
+  }
+
+  // Update max/restore icon
+  api.onMaximizeChange((isMax) => {
+    const maxBtn = document.getElementById('win-max');
+    if (!maxBtn) return;
+    maxBtn.querySelector('svg').innerHTML = isMax
+      ? '<path d="M2 0h8v8H2zm-2 2v10h10V9H8V2H0z" fill="currentColor"/>'
+      : '<rect x="0.5" y="0.5" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1"/>';
+  });
+})();
+</script>
+
+</body>
+</html>
