@@ -13,6 +13,7 @@
 
 - [Overview](#-overview)
 - [Features](#-features)
+- [Screenshots](#-screenshots)
 - [Requirements](#-requirements)
 - [Installation](#-installation)
 - [Running in Development](#-running-in-development)
@@ -43,6 +44,41 @@
 - 💾 **Persistent settings & queue** — saved automatically between sessions
 - ⚙️ **Configurable API base URL** — editable from the in-app Settings
 - 🎛️ **Smart window controls** — custom close/minimize/maximize buttons on Windows/Linux, native traffic-light buttons on macOS
+
+---
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="screenshots/01-artist-page.png" alt="Artist page" /><br />
+      <sub><b>Artist page</b> — hero banner, avatar, “Play Top” and popular tracks with quality badges</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="screenshots/02-album-page.png" alt="Album page" /><br />
+      <sub><b>Album page</b> — Hi-Res badge, track count and duration, label info and the full tracklist</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="screenshots/03-fullscreen-player.png" alt="Fullscreen player" /><br />
+      <sub><b>Fullscreen player</b> — large cover art, quality badges (24-bit / 44.1 kHz) and a floating glass control panel</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="screenshots/04-fullscreen-lyrics.png" alt="Fullscreen lyrics" /><br />
+      <sub><b>Synced lyrics view</b> — compact player on the left, large scrolling lyrics on the right</sub>
+    </td>
+  </tr>
+  <tr>
+   <td align="center" colspan="2">
+    <video src="https://private-user-images.githubusercontent.com/150908170/691581817-3d53d4be-12d8-4e53-b5d1-438fa572eff5.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTM1NTgxNTAsIm5iZiI6MTc5MzU1Nzg1MCwicGF0aCI6Ii8xNTA5MDgxNzAvNjkxNTgxODE3LTNkNTNkNGJlLTEyZDgtNGU1My1iNWQxLTQzOGZhNTcyZWZmNS5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYxMTAxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MTEwMVQxODMwNTBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jZmFlMzBmOWMwMDUxMzE2MzQxMDA4NDE4ZWM1N2Y2NGY2YzhlNDY4MTU2NWQ3YTk1NGUzYjlkMmFlZjE2YjZhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LXR5cGU9dmlkZW8lMkZtcDQifQ.nKb2yMDC8-zMBE_AT11rILsBS8lzU05OurBI-1H1pi4" alt="Animated Cover From Apple Music" /><br />
+    <sub><b>Animated Cover From Apple Music</b> — Animated cover on the left</sub>
+   </td>
+</tr>
+</table>
+
+> 💡 The floating player bar at the bottom of the main window (visible in the first two screenshots) shows the current track, its audio quality (e.g. *FLAC · 24-BIT / 44.1 kHz*), playback controls, lyrics, queue and volume.
 
 ---
 
