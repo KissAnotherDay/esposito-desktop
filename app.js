@@ -9,15 +9,15 @@ import {
   isAuthenticated, setCredentials, clearCredentials
 } from './api.js';
 
-// Intercetta tutti i brani e aggiunge la versione al titolo se presente
+// Intercept all tracks and append the version to the title when present
 function transformTrack(t, options) {
-  // 1. Elabora il brano normalmente con la funzione originale
+  // 1. Process the track normally with the original function
   const track = originalTransformTrack(t, options);
   
-  // 2. Se la risposta API contiene una "version" (es. RMX, Live, Acoustic...)
+  // 2. If the API response contains a "version" (e.g. RMX, Live, Acoustic...)
   if (t.version) {
-    // Controllo di sicurezza: se la versione non è già scritta nel titolo, la aggiunge tra parentesi
-    if (!track.title.toLowerCase().includes(t.version.toLowerCase())) {
+    // Safety check: if the version is not already in the title, append it in parentheses
+    if (!track.title.toLowerCase().includes(t.version.toLowerCase()) && t.version.toLowerCase()!="album version") {
       track.title = `${track.title} (${t.version})`;
     }
   }
@@ -35,16 +35,16 @@ import {
 
 import { getAppleAlbumId, getAnimatedArtwork, coverVideoManager, getAppleArtistImage } from './apple.js';
 
-// --- GESTORE TESTI ---
+// --- LYRICS MANAGER ---
 import { LyricsManager } from './lyrics.js';
 
 // --- METADATA TAGGER ---
 import { embedMetadata } from './tagger.js';
 
-//--- APPLE MUSIC ---
+// --- APPLE MUSIC ---
 import { AppleImporter } from './apple_import.js';
 
-// ── GESTORE DATABASE FILE LOCALI (IndexedDB) ───────────────────
+// ── LOCAL FILE DATABASE MANAGER (IndexedDB) ────────────────────
 window.LocalDB = {
   init() {
     return new Promise((resolve, reject) => {
@@ -92,7 +92,7 @@ class App {
     this._playlists = [];
     this._settings = this._loadSettings();
 
-    // Carica le ricerche recenti
+    // Load recent searches
     this._recentSearches = JSON.parse(localStorage.getItem('recent_searches') || '[]');
     
     this._pendingRestoreTime = null;
@@ -100,14 +100,13 @@ class App {
     this._bindPlayer();
     this._bindKeyboard();
     this._initDragAndDrop();
-    
 
-    // FIX CACHE: Salva coda e minutaggio prima del Refresh
+// Save the queue and playback position before a refresh
     const saveSession = () => {
       if (window.player && window.player.queue && window.player.queue.length > 0) {
         localStorage.setItem('saved_queue', JSON.stringify(window.player.queue));
         localStorage.setItem('saved_queue_idx', window.player.queueIdx);
-        // Salva il tempo corrente reale se sta suonando o è in pausa
+        // Save the real current time if playing or paused
         const currentTime = window.player.audio ? window.player.audio.currentTime : (this._lastTrackTime || 0);
         localStorage.setItem('saved_track_time', currentTime);
       }
@@ -126,8 +125,7 @@ class App {
     });
   }
 
-
-  // ── INIT ────────────────────────────────────────────────────
+// ── INIT ────────────────────────────────────────────────────
   async init() {
 
     if (!isAuthenticated()) {
@@ -135,7 +133,7 @@ class App {
       return;
     }
 
-    // 2. Se è loggato, nascondi il login e prosegui
+    // 2. If logged in, hide the login screen and continue
     const loginOverlay = document.getElementById('login-overlay');
     if(loginOverlay) loginOverlay.style.display = 'none';
 
@@ -152,10 +150,8 @@ class App {
     
     const searchInput = document.getElementById('titlebar-search');
     if (searchInput) searchInput.value = '';
-    
-    //await detectCountry();
 
-    // FIX SIDEBAR: Ripristina stato salvato
+// Restore the saved sidebar state
     const isSidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     if (isSidebarCollapsed || window.innerWidth <= 767) {
       document.getElementById('sidebar').classList.add('collapsed');
@@ -163,12 +159,12 @@ class App {
       document.getElementById('sidebar').classList.remove('collapsed');
     }
 
-    // RIPRISTINO SESSIONE
+    // Session restore
     const savedQueue = JSON.parse(localStorage.getItem('saved_queue') || 'null');
     const savedIdx   = parseInt(localStorage.getItem('saved_queue_idx') || '0', 10);
     const savedTime  = parseFloat(localStorage.getItem('saved_track_time') || '0');
 
-    // AGGIUNTA: Recupera stato Shuffle e Repeat
+    // Restore the Shuffle and Repeat state
     const savedShuffle = localStorage.getItem('saved_shuffle') === 'true';
     const savedRepeat  = parseInt(localStorage.getItem('saved_repeat') || '0', 10);
 
@@ -176,16 +172,16 @@ class App {
       window.player.shuffle = savedShuffle;
       window.player.repeat  = savedRepeat;
       
-      // Aggiorna visivamente la UI all'avvio
+      // Update the UI visually on startup
       this._updatePlayerUI({
-        isPlaying: false, // Di default all'avvio è in pausa
+        isPlaying: false, // Paused by default on startup
         shuffle: savedShuffle,
         repeat: savedRepeat
       });
     }
 
     if (savedQueue && savedQueue.length > 0) {
-      // Ripristina stato interno del player
+      // Restore the player's internal state
       window.player.queue        = savedQueue;
       window.player.queueIdx     = savedIdx;
       window.player.currentTrack = savedQueue[savedIdx];
@@ -193,7 +189,7 @@ class App {
       this._updateNowPlaying(window.player.currentTrack);
       this._renderQueue(savedQueue, savedIdx);
       
-      // Aggiorna UI Seekbar visivamente
+      // Update the seekbar UI
       const trackDur  = window.player.currentTrack.duration || 1;
       const pct       = Math.min(1, Math.max(0, savedTime / trackDur));
       const fill      = document.getElementById('seekbar-fill');
@@ -206,7 +202,7 @@ class App {
       if (curTimeEl) curTimeEl.textContent   = formatDur(savedTime);
       if (fsCurTimeEl) fsCurTimeEl.textContent = formatDur(savedTime);
 	  
-	  // FIX TESTI: Ripristina i testi della traccia ricaricata
+	  // Restore the lyrics of the reloaded track
       if (window.player.currentTrack) {
         const t = window.player.currentTrack;
         LyricsManager.load(
@@ -217,7 +213,7 @@ class App {
         );
       }
 
-      // FIX LOOP INFINITO: Carica effettivamente lo stream audio
+      // Actually load the audio stream (avoids an infinite loop)
       if (window.player.currentTrack) {
         try {
           const track = window.player.currentTrack;
@@ -225,20 +221,20 @@ class App {
           let streamUrl = null;
 
           if (isLocal) {
-            // È un file locale: recuperalo dal database permanente
+            // Local file: fetch it from the permanent database
             if (window.LocalDB) {
               const file = await window.LocalDB.getFile(track.id);
               if (file) {
-                // Crea un nuovo link temporaneo per questa sessione
+                // Create a new temporary URL for this session
                 streamUrl = URL.createObjectURL(file);
-                // Salvalo nel player per poterlo ripulire in seguito ed evitare memory leak
+                // Store it on the player so it can be revoked later (avoids a memory leak)
                 window.player._lastLocalUrl = streamUrl; 
               } else {
-                console.warn("File locale non trovato nel database al ripristino.");
+                console.warn("Local file not found in database");
               }
             }
           } else {
-            // È una traccia API: recupera URL fresco in base alla qualità
+            // API track: fetch a fresh URL for the selected quality
             const q = this._settings.quality;
             const data = await getStreamUrl(track.id || track.originalId, q);
             if (data && data.url) {
@@ -256,18 +252,17 @@ class App {
                 this._pendingRestoreTime = null;
               }
             }, { once: true });
-            // Nota: Non invochiamo .play() automaticamente per evitare blocchi del browser,
-            // ma ora il player è pronto ("Loaded") e non girerà a vuoto.
+            // Note: .play() is not called automatically, to avoid browser autoplay blocks,
+            // but the player is now ready ("Loaded") and will not spin idle.
           }
         } catch (e) {
-          console.error("Errore ripristino stream audio:", e);
+          console.error("Error to reset audio stream", e);
         }
       }
 
     }
 
-    
-    const lastView = localStorage.getItem('last_view') || 'home';
+const lastView = localStorage.getItem('last_view') || 'home';
     const lastData = localStorage.getItem('last_view_data') || null;
     await this.navigate(lastView, lastData !== 'null' ? lastData : null, false);
     
@@ -287,22 +282,19 @@ class App {
       
       setCredentials(id, secret, token);
       document.getElementById('login-overlay').style.display = 'none';
-      this.init(); // Fa ripartire l'app ora che ha i token
+      this.init(); // Restart the app now that the tokens are available
       toast('Login successful', 'success');
     }
 
     doLogout() {
       clearCredentials();
-      location.reload(); // Ricarica la pagina per resettare gli stati e mostrare il login
+      location.reload(); // Reload the page to reset state and show the login screen
     }
 
   // ── SETTINGS ────────────────────────────────────────────────
   _loadSettings() {
     const defaults = {
       quality: '27',
-      //crossfade: false,
-      //gapless: true,
-      //autoplay: false,
       showTrackNumbers: true,
       explicitContent: true,
       notifications: true,
@@ -313,7 +305,7 @@ class App {
       scrobble: false,
       theme: 'dark',
       dynamicColor: false,
-	    discordRPC: true, //Discord function
+	    discordRPC: true, // Discord Rich Presence
     };
     try {
       return { ...defaults, ...JSON.parse(localStorage.getItem('settings') || '{}') };
@@ -329,21 +321,16 @@ class App {
       player.setQuality(this._settings.quality);
       this._lastAppliedQuality = this._settings.quality;
     }
-    
-    /*player.gapless   = !!this._settings.gapless;
-    player.crossfade  = !!this._settings.crossfade;
-    player.autoplay   = !!this._settings.autoplay;
-    player.normalize  = !!this._settings.normalize;*/
 
-    document.body.classList.toggle('hide-explicit',       !this._settings.explicitContent);
+document.body.classList.toggle('hide-explicit',       !this._settings.explicitContent);
     document.body.classList.toggle('hide-track-nums',     !this._settings.showTrackNumbers);
     document.body.classList.toggle('disable-animations',  !this._settings.animationsEnabled);
 
-    // FIX: Applica o rimuovi il Dynamic Color in tempo reale quando usi il toggle nelle impostazioni
+    // Apply or remove Dynamic Color in real time when the setting is toggled
     if (!this._settings.dynamicColor) {
-      this._resetDynamicColor(); // Se lo spegni, resetta tutto istantaneamente
+      this._resetDynamicColor(); // If turned off, reset everything immediately
     } else {
-      // Se lo riaccendi e c'è già una canzone in play, ri-calcola il colore subito
+      // If turned back on and a song is already playing, recompute the color right away
       if (window.player && window.player.currentTrack) {
         const cover = coverUrl(window.player.currentTrack.album?.image?.large || window.player.currentTrack.album?.cover);
         if (cover) this._extractColor(cover);
@@ -372,13 +359,12 @@ class App {
       this._updateNowPlaying(window.player.currentTrack);
     }
 	
-	//Discord function
+	// Discord Rich Presence
 	if (window.electronAPI && typeof window.electronAPI.setDiscordRPC === 'function') {
       window.electronAPI.setDiscordRPC(!!this._settings.discordRPC);
     }
-	
-	
-  }
+
+}
 
   setSetting(key, value) {
     this._settings[key] = value;
@@ -405,7 +391,7 @@ class App {
   // ── NAVIGATION ──────────────────────────────────────────────
   async navigate(view, data, pushHistory = true, restoreScroll = 0) {
 
-    //reset the color
+    // Reset the color
     this._resetDynamicColor();
 
     if (this._abortController) {
@@ -414,7 +400,7 @@ class App {
     this._abortController = new AbortController();
 
     if (pushHistory && view !== this.currentView) {
-      // --- SALVA LO SCROLL ---
+      // --- SAVE SCROLL POSITION ---
       let currentScroll = 0;
       const currentViewEl = document.getElementById('view-' + this.currentView);
       const contentEl = document.getElementById('content');
@@ -426,7 +412,6 @@ class App {
       }
 
       this.history.push({ view: this.currentView, data: this._currentData, scroll: currentScroll });
-      // -----------------------
       
       this.forwardHistory = [];
     }
@@ -445,7 +430,7 @@ class App {
       if (searchInput) searchInput.value = '';
       this._searchQuery = '';
       
-      // AGGIUNTA: Nasconde il tasto X se non siamo nella vista ricerca
+      // Hide the X button when not in the search view
       const closeBtn = document.getElementById('close-search-btn');
       if (closeBtn) closeBtn.style.display = 'none';
     }
@@ -460,12 +445,10 @@ class App {
     const viewEl = document.getElementById('view-' + view);
     if (viewEl) {
       viewEl.classList.add('active');
-      //viewEl.scrollTop = 0;
 	  
-    //fix scrollbar in Album
+    // Scrollbar handling for the Album view
     const contentEl = document.getElementById('content');
     if (contentEl) contentEl.scrollTop = 0;
-    //
     
     if (this._settings.animationsEnabled) fadeIn(viewEl);
     }
@@ -493,15 +476,15 @@ class App {
       case 'settings':     this._renderSettings();          break;
     }
 
-    // --- RIPRISTINA LO SCROLL SE TORNI INDIETRO ---
+    // --- RESTORE SCROLL WHEN GOING BACK ---
     if (!pushHistory && restoreScroll > 0) {
-      // Un piccolo timeout serve per dare il tempo al browser di stampare 
-      // a schermo il nuovo HTML generato dallo switch qui sopra
+      // A short timeout gives the browser time to render
+      // the new HTML generated by the switch above
       setTimeout(() => {
         const viewEl = document.getElementById('view-' + view);
         const contentEl = document.getElementById('content');
         
-        // Controlla quale contenitore si occupa effettivamente dello scroll
+        // Check which container actually handles scrolling
         if (contentEl && contentEl.scrollHeight > contentEl.clientHeight) {
             contentEl.scrollTop = restoreScroll;
         } else if (viewEl) {
@@ -512,7 +495,7 @@ class App {
 
   }
 
-  // Helper per mantenere attivo l'elemento corretto nella sidebar
+  // Helper that keeps the correct sidebar item active
   _updateSidebarActiveState() {
     const view = this.currentView;
     const data = this._currentData;
@@ -530,7 +513,7 @@ class App {
   goBack() {
     if (!this.history.length) return;
     
-    // Salva lo scroll attuale casomai volessimo fare "Avanti"
+    // Save the current scroll position in case we later go "Forward"
     let currentScroll = 0;
     const currentViewEl = document.getElementById('view-' + this.currentView);
     const contentEl = document.getElementById('content');
@@ -540,15 +523,15 @@ class App {
     this.forwardHistory.push({ view: this.currentView, data: this._currentData, scroll: currentScroll });
     
     const prev = this.history.pop();
-    // Passa lo scroll salvato a navigate (aggiungiamo il 4° parametro)
+    // Pass the saved scroll to navigate (adds a 4th parameter)
     this.navigate(prev.view, prev.data, false, prev.scroll || 0);
   }
 
   goForward() {
     if (!this.forwardHistory.length) return;
     
-    // 1. Salva lo scroll attuale nella cronologia "indietro", casomai l'utente 
-    // volesse tornare di nuovo indietro dopo essere andato avanti
+    // 1. Save the current scroll in the "back" history, in case the user
+    // wants to go back again after having gone forward
     let currentScroll = 0;
     const currentViewEl = document.getElementById('view-' + this.currentView);
     const contentEl = document.getElementById('content');
@@ -557,27 +540,26 @@ class App {
 
     this.history.push({ view: this.currentView, data: this._currentData, scroll: currentScroll });
     
-    // 2. Recupera la vista successiva (che avevamo salvato premendo 'goBack')
+    // 2. Get the next view (saved when 'goBack' was pressed)
     const next = this.forwardHistory.pop();
     
-    // 3. Naviga verso la vista successiva, passando lo scroll salvato!
+    // 3. Navigate to the next view, passing the saved scroll
     this.navigate(next.view, next.data, false, 0);
   }
 
-
-  toggleLyricsView() {
+toggleLyricsView() {
     if (this.currentView === 'lyrics') {
-      // Se non c'è cronologia (es. hai appena aggiornato la pagina con Ctrl+R)
+      // If there is no history (e.g. the page was just refreshed with Ctrl+R)
       if (this.history.length === 0) {
-        this.navigate('home'); // Torna alla home come fallback
+        this.navigate('home'); // Fall back to home
       } else {
-        this.goBack(); // Altrimenti torna indietro normalmente
+        this.goBack(); // Otherwise go back normally
       }
     } else {
-      // Altrimenti naviga verso i testi
+      // Otherwise navigate to the lyrics
       this.navigate('lyrics');
       
-      // Forza lo scorrimento alla riga attiva quando si apre la visuale
+      // Force scrolling to the active line when the view opens
       setTimeout(() => {
         const stdContainer = document.getElementById('standard-lyrics-container');
         if (stdContainer) {
@@ -588,7 +570,7 @@ class App {
     }
   }
 
-  // FIX SIDEBAR: Salva lo stato in localStorage
+  // Save the sidebar state to localStorage
   toggleSidebar() {
     const sb = document.getElementById('sidebar');
     sb.classList.toggle('collapsed');
@@ -658,8 +640,6 @@ class App {
     const sections = [
       { id: 'feat-editor',      type: 'editor-picks',       label: "Editor's Picks" },
       { id: 'feat-bestsellers', type: 'best-sellers',        label: 'Best Sellers'   },
-      //{ id: 'feat-press',       type: 'press-awards-full',   label: 'Press Awards'   },
-      //{ id: 'feat-streamed',    type: 'most-streamed',       label: 'Most Streamed'  },
     ];
     sections.forEach(s => {
       document.getElementById(s.id).innerHTML = `<div class="grid">${skeletonGrid(4)}</div>`;
@@ -689,9 +669,8 @@ class App {
         el.innerHTML = '<div class="empty-state"><p>Error loading</p></div>';
     }
   }
-  
 
-  // ── USER INFO ────────────────────────────────────────────
+// ── USER INFO ────────────────────────────────────────────
 
   async _loadUserInfo() {
     const sig = this._abortController.signal;
@@ -730,16 +709,14 @@ class App {
 
       staggerFadeIn(el);
     } catch (e) {
-      console.error('Errore _loadUserInfo:', e);
+      console.error('Error _loadUserInfo:', e);
       if (e.name !== 'AbortError') {
         el.innerHTML = '<div class="empty-state"><p>Error loading</p></div>';
       }
     }
   }
 
-
-
-  // ── NEW RELEASES ────────────────────────────────────────────
+// ── NEW RELEASES ────────────────────────────────────────────
   async _loadNewReleases() {
     const sig = this._abortController.signal;
     const el  = document.getElementById('new-releases-grid');
@@ -792,20 +769,11 @@ class App {
           
           const staticBg = heroSection.querySelector('.hero-bg');
           const staticBgEnhanced = heroSection.querySelector('.hero-bg-enhanced');
-          
-          /*if (staticBg && !heroSection.querySelector('#hero-video-bg')) {
-            staticBg.insertAdjacentHTML('afterend', `<video id="hero-video-bg" autoplay loop muted playsinline crossorigin="anonymous" style="position:absolute; inset:-10px; width:calc(100% + 20px); height:calc(100% + 20px); object-fit:cover; filter:none; opacity:0; pointer-events:none; z-index:0;"></video>`);
-          }*/
-          
-          const videoArt = heroEl.querySelector('#hero-video-art');
+
+const videoArt = heroEl.querySelector('#hero-video-art');
           const videoBg  = heroEl.querySelector('#hero-video-bg');
 
-          /*coverVideoManager.play(videoArt, album, 'square', () => {
-             if (staticBg) staticBg.style.opacity = '0';
-             if (staticBgEnhanced) staticBgEnhanced.style.opacity = '0';
-          });*/
-
-          // Fa partire solo il video quadrato, lasciando intatto lo sfondo statico!
+// Play only the square video, leaving the static background untouched
           coverVideoManager.play(videoArt, album, 'square');
           
           if (videoBg) {
@@ -813,7 +781,7 @@ class App {
           }
         }
       } else {
-        // Ferma le riproduzioni pendenti se disattivato
+        // Stop pending playbacks when disabled
         if(heroEl.querySelector('#hero-video-art')) coverVideoManager.stop(heroEl.querySelector('#hero-video-art'));
         if(heroEl.querySelector('#hero-video-bg')) coverVideoManager.stop(heroEl.querySelector('#hero-video-bg'));
       }
@@ -838,14 +806,13 @@ class App {
 
       staggerFadeIn(tracksEl, '.track-row');
 
-      // Dynamic color dalla copertina dell'album
+      // Dynamic color from the album cover
       if (this._settings.dynamicColor) {
         const albumCover = coverUrl(album.image?.large);
         if (albumCover) this._extractColor(albumCover);
       }
-	  
 
-    } catch(e) {
+} catch(e) {
       if (e.name !== 'AbortError') {
         heroEl.innerHTML = '<div style="padding:32px;color:var(--text2);">Error loading album</div>';
         console.error(e);
@@ -853,17 +820,15 @@ class App {
     }
   }
 
-  
-
-  _getAbsoluteIdx(tracks, id) {
+_getAbsoluteIdx(tracks, id) {
     return tracks.findIndex(t => t.id === id);
   }
 
-  // ── FIX IMMAGINI ARTISTI NELLE CARD ────────────────────────
+  // ── ARTIST IMAGE FIX IN CARDS ──────────────────────────────
   _fetchMissingArtistImages(container, searchedName = null) {
     if (!container) return;
     
-    // Cerca tutte le card all'interno del contenitore
+    // Find all the cards inside the container
     const cards = container.querySelectorAll('.card');
     
     cards.forEach(card => {
@@ -874,20 +839,20 @@ class App {
       if (art && placeholder && titleEl) {
         const artistName = titleEl.textContent.trim();
         
-        // Se stiamo filtrando per ricerca, salta la card se il nome non è identico
+        // When filtering by search, skip the card if the name is not an exact match
         if (searchedName && artistName.toLowerCase() !== searchedName.toLowerCase()) {
           return;
         }
         
         getAppleArtistImage(artistName).then(imgUrl => {
           if (imgUrl) {
-            // Rimuove la nota musicale
+            // Remove the music note
             placeholder.remove();
             
-            // Inserisce l'immagine
+            // Insert the image
             art.insertAdjacentHTML('afterbegin', `<img src="${imgUrl}" alt="${escHtml(artistName)}" onerror="this.outerHTML='<div class=&quot;card-placeholder&quot;>♪</div>'" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s, transform 0.35s cubic-bezier(.4,0,.2,1);">`);
             
-            // Trigger animazione CSS
+            // Trigger the CSS animation
             setTimeout(() => {
               const img = art.querySelector('img');
               if (img) img.style.opacity = '1';
@@ -927,25 +892,23 @@ class App {
       heroEl.innerHTML = artistHero(artist);
       fadeIn(heroEl.firstElementChild);
 
-      // --- RECUPERO AVATAR E SFONDO MANCANTI DA APPLE MUSIC ---
+      // --- FETCH MISSING AVATAR AND BACKGROUND FROM APPLE MUSIC ---
       const avatarContainer = heroEl.querySelector('.artist-avatar');
       
       if (avatarContainer && !avatarContainer.querySelector('img')) {
         getAppleArtistImage(artist.name).then(imgUrl => {
           if (imgUrl) {
             
-            // Inserisce l'avatar con fallback e transizione combinata
+            // Insert the avatar with fallback and combined transition
             avatarContainer.innerHTML = `<img src="${imgUrl}" alt="${escHtml(artist.name)}", draggable=false onerror="this.outerHTML='<div class=&quot;artist-avatar-placeholder&quot;>♪</div>'" style="width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity 0.5s, transform 0.35s ease;">`;
-            
-            
-            
-            // 2. Imposta l'immagine come background dell'Hero (se non c'è il video, si vedrà questa)
+
+// 2. Set the image as the hero background (shown if there is no video)
             const heroBg = heroEl.querySelector('.artist-hero-bg') || heroEl.querySelector('.hero-bg');
             if (heroBg) {
               heroBg.style.backgroundImage = `url('${imgUrl}')`;
             }
 
-            // Trigger animazione
+            // Trigger animation
             setTimeout(() => {
               const newImg = avatarContainer.querySelector('img');
               if(newImg) newImg.style.opacity = '1';
@@ -954,21 +917,21 @@ class App {
         });
       }
 
-      // --- ANIMATED BACKGROUND ARTIST (Posizionamento sovrapposto) ---
+      // --- ANIMATED ARTIST BACKGROUND (overlay positioning) ---
       if (this._settings.animatedCovers) {
         const heroSection = heroEl.firstElementChild; 
         const bgTarget = heroEl.querySelector('.hero-bg') || heroEl.querySelector('.artist-hero-bg') || heroSection;
 
         if (bgTarget && !heroEl.querySelector('#artist-video-bg')) {
           if (bgTarget.parentElement) {
-            // Il contenitore deve essere relativo per ospitare il video assoluto
+            // The container must be relative to host the absolutely positioned video
             bgTarget.parentElement.style.position = 'relative';
-            // Lasciamo che l'altezza sia determinata dal video o dal contenuto
+            // Let the height be determined by the video or the content
             bgTarget.parentElement.style.height = 'auto'; 
-            bgTarget.parentElement.style.minHeight = '500px'; // Altezza minima dell'intestazione //da modificare per adattare il video
+            bgTarget.parentElement.style.minHeight = '500px'; // Minimum header height (TODO: adjust to fit the video)
           }
 
-          // Inseriamo il video con posizionamento assoluto per stare "sotto" i testi
+          // Insert the video with absolute positioning so it sits "under" the text
           bgTarget.insertAdjacentHTML('afterend', `
             <video id="artist-video-bg" 
                   autoplay loop muted playsinline 
@@ -1032,8 +995,7 @@ class App {
         allReleases = raw.albums.items;
       }
 
-      
-      allReleases = sortByDate(allReleases);
+allReleases = sortByDate(allReleases);
 
       const { albums, eps, singles } = partitionReleases(allReleases);
       this._currentArtistAlbums      = albums;
@@ -1048,9 +1010,7 @@ class App {
       const appEl = document.getElementById('artist-appearances');
       this._renderArtistSection(appEl, 'artist-appearances-section', this._currentArtistAppearances, 'appearances');
 
-      //this._loadSimilarArtists(String(artist.id), simEl, sig);
-
-    } catch(e) {
+} catch(e) {
       if (e.name !== 'AbortError') {
         heroEl.innerHTML = '<div style="padding:32px;color:var(--text2);">Error loading artist</div>';
         console.error(e);
@@ -1122,9 +1082,7 @@ class App {
     }
   }
 
-  
-
-  playArtistTop() {
+playArtistTop() {
     if (this._currentArtistTracks.length) this.playFromList(this._currentArtistTracks, 0);
   }
 
@@ -1320,7 +1278,7 @@ class App {
     });
 
     el.innerHTML = html;
-    // Ricalcola lo stato attivo qui perché l'HTML è stato sostituito
+    // Recompute the active state here because the HTML was replaced
     this._updateSidebarActiveState();
 
     try {
@@ -1332,12 +1290,12 @@ class App {
         </div>`;
       });
       el.innerHTML = html;
-      // Ricalcola ancora lo stato attivo per le playlist caricate asincronamente
+      // Recompute the active state again for playlists loaded asynchronously
       this._updateSidebarActiveState();
     } catch {}
   }
 
-  // Crea playlist vuota direttamente dalla sidebar
+  // Create an empty playlist directly from the sidebar
   createLocalPlaylistEmpty() {
     modal('New Playlist',
       `<input id="new-pl-name" type="text" placeholder="Playlist name…"
@@ -1381,7 +1339,7 @@ class App {
     }
   }
 
-  // NUOVO METODO: Gestisce il click (focus) sulla barra
+  // Handles the click (focus) on the search bar
   onSearchFocus() {
     const closeBtn = document.getElementById('close-search-btn');
     if (closeBtn) closeBtn.style.display = 'block';
@@ -1391,7 +1349,7 @@ class App {
     }
   }
 
-  // NUOVO METODO: Chiude la ricerca e torna indietro
+  // Closes the search and goes back
   closeSearch() {
     const input = document.getElementById('titlebar-search');
     if (input) {
@@ -1404,7 +1362,7 @@ class App {
     if (closeBtn) closeBtn.style.display = 'none';
 
     if (this.currentView === 'search') {
-      // Se c'è una cronologia, torna indietro. Altrimenti (dopo un refresh) vai alla Home.
+      // If there is history, go back. Otherwise (after a refresh) go Home.
       if (this.history.length > 0) {
         this.goBack();
       } else {
@@ -1413,8 +1371,7 @@ class App {
     }
   }
 
-
-  onSearchInput(q) {
+onSearchInput(q) {
     this._searchQuery = q.trim();
     clearTimeout(this._searchDebounce);
     if (this._searchQuery.length < 2) {
@@ -1517,7 +1474,7 @@ class App {
     if (!tracks || !tracks.length) return;
     const track = tracks[idx];
     
-    // FIX BUG PLAY/PAUSE
+    // Play/pause handling
     const currentId = player.currentTrack?.id;
     const targetId  = track?.id;
 
@@ -1562,10 +1519,10 @@ class App {
     
     const andClose = "; document.body.click(); window.app.closeFullscreen();";
     
-    // Verifica se è un file locale
+    // Check whether it is a local file
     const isLocal = track.is_local || String(track.id).startsWith('local_');
 
-    // Voci base (sempre visibili)
+    // Base items (always visible)
     let menu = [
       { icon: '▶', label: 'Play now',       action: `window.app.playFromList(${JSON.stringify(list).replace(/"/g,'&quot;')}, ${idx}); document.body.click()` },
       { icon: '↓', label: 'Play next',      action: `window.app.playNext(${JSON.stringify(track).replace(/"/g,'&quot;')}); document.body.click()` },
@@ -1576,7 +1533,7 @@ class App {
       menu.push({ icon: '♡', label: 'Add to playlist', action: `window.app.showAddToPlaylist(${JSON.stringify(track).replace(/"/g,'&quot;')}); document.body.click()` });
     }
 
-    // Mostra Album e Artista SOLO se non è un file locale
+    // Show Album and Artist ONLY if it is not a local file
     if (!isLocal) {
       menu.push(
         { separator: true },
@@ -1585,13 +1542,13 @@ class App {
       );
     }
 
-    // Mostra il Download SOLO se non è un file locale
+    // Show Download ONLY if it is not a local file
     if (!isLocal) {
       menu.push({ separator: true });
       menu.push({ icon: '⬇', label: 'Download track', action: `window.app.downloadTrack(${JSON.stringify(track).replace(/"/g,'&quot;')}); document.body.click()` });
     }
 
-    // --- Logica per la rimozione dalle playlist (invariata) ---
+    // --- Playlist removal logic (unchanged) ---
     if (this.currentView === 'playlist' && String(this._currentData).startsWith('local_')) {
       menu.push({ separator: true });
       menu.push({ 
@@ -1610,7 +1567,6 @@ class App {
       { icon: '⇄', label: 'Shuffle album', action: `window.app.shuffleAlbum('${albumId}')` },
       { icon: '↓', label: 'Add to queue',  action: `window.app.addAlbumToQueue('${albumId}')` },
       { separator: true },
-      //{ icon: '⬇', label: 'Download ZIP',  action: `window.app.downloadAlbumUI('${albumId}')` },
       { icon: '♡', label: 'Add to playlist', action: `window.app.showAddAlbumToPlaylist('${albumId}')` },
     ]);
   }
@@ -1639,7 +1595,7 @@ class App {
     } catch { toast('Error', 'error'); }
   }
 
-  // ── ADD TO PLAYLIST (LOCALE) ─────────────────────────────────
+  // ── ADD TO PLAYLIST (LOCAL) ──────────────────────────────────
   showAddToPlaylist(track) {
     const localPls = JSON.parse(localStorage.getItem('local_playlists') || '[]');
     modal('Add to Playlist',
@@ -1825,18 +1781,17 @@ class App {
     this.navigate('home');
   }
 
-
-  // ── FILTRO RICERCA PLAYLIST ──────────────────────────────────
+// ── PLAYLIST SEARCH FILTER ───────────────────────────────────
   filterPlaylist(query) {
     const term = query.toLowerCase();
     const tracks = document.querySelectorAll('#playlist-tracks .track-row');
     
     tracks.forEach(row => {
-      // Estrae il testo del titolo e dell'artista
+      // Extract the title and artist text
       const title = row.querySelector('.track-title')?.textContent.toLowerCase() || '';
       const artist = row.querySelector('.track-artist')?.textContent.toLowerCase() || '';
       
-      // Mostra o nasconde la riga in base al match
+      // Show or hide the row depending on the match
       if (title.includes(term) || artist.includes(term)) {
         row.style.display = '';
       } else {
@@ -1845,14 +1800,12 @@ class App {
     });
   }
 
-  // ── IMPORT FILE LOCALI (CON CALCOLO BITRATE MAGICO) ────────────────
+  // ── LOCAL FILE IMPORT (WITH BITRATE ESTIMATION) ────────────────────
   async importLocalFiles(event) {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    //toast('Lettura metadati e analisi qualità in corso...', 'info');
-
-    let localPls = JSON.parse(localStorage.getItem('local_playlists') || '[]');
+let localPls = JSON.parse(localStorage.getItem('local_playlists') || '[]');
     let libraryPl = localPls.find(p => p.id === 'local_library');
     if (!libraryPl) {
       libraryPl = { id: 'local_library', name: 'Local Library', tracks: [] };
@@ -1886,7 +1839,7 @@ class App {
       let albumTitle = 'Local Files';
       let coverUrl = null;
 
-      // 1. Estrai i metadati dal file se presenti
+      // 1. Extract the metadata from the file, if present
       const tags = await parseTags(file);
       if (tags) {
         if (tags.title) title = tags.title;
@@ -1902,11 +1855,11 @@ class App {
         }
       }
 
-      // 2. Calcola la durata esatta
+      // 2. Compute the exact duration
       const duration = await getDuration(fileUrl);
 
-      // --- IL TRUCCO MAGICO: CALCOLO DEL BITRATE ---
-      // Bitrate (kbps) = (Dimensione in byte * 8 bit) / secondi / 1000
+      // --- THE TRICK: BITRATE ESTIMATION ---
+      // Bitrate (kbps) = (size in bytes * 8 bits) / seconds / 1000
       const bitrateKbps = duration > 0 ? (file.size * 8) / duration / 1000 : 0;
       
       const fname = file.name.toLowerCase();
@@ -1917,21 +1870,21 @@ class App {
       if (fname.endsWith('.mp3') || file.type.includes('mp3')) {
         quality = 'MP3';
       } else if (fname.endsWith('.wav')) {
-        // I file WAV non sono compressi, pesano di più
+        // WAV files are uncompressed, so they are larger
         if (bitrateKbps > 4000) { depth = 24; sr = 192.0; } // Hi-Res
         else if (bitrateKbps > 2000) { depth = 24; sr = 96.0; }  // Hi-Res
         else if (bitrateKbps > 1400) { depth = 24; sr = 44.1; }  // 24-bit Standard
       } else {
-        // FLAC e ALAC (Compressi Lossless)
-        if (bitrateKbps > 3000) { depth = 24; sr = 192.0; } // Hi-Res pesante
-        else if (bitrateKbps > 1800) { depth = 24; sr = 96.0; }  // Hi-Res classico
-        else if (bitrateKbps > 1100) { depth = 24; sr = 44.1; }  // 24-bit compresso
-        // Sotto i 1100 kbps resterà FLAC 16-bit
+        // FLAC and ALAC (compressed lossless)
+        if (bitrateKbps > 3000) { depth = 24; sr = 192.0; } // Heavy Hi-Res
+        else if (bitrateKbps > 1800) { depth = 24; sr = 96.0; }  // Classic Hi-Res
+        else if (bitrateKbps > 1100) { depth = 24; sr = 44.1; }  // Compressed 24-bit
+        // Below 1100 kbps it stays 16-bit FLAC
       }
 
       const uniqueId = 'local_file_' + Date.now() + '_' + i;
 
-      // Salva fisicamente il file nel Database Permanente
+      // Physically save the file in the permanent database
       await window.LocalDB.saveFile(uniqueId, file);
 
       libraryPl.tracks.push({
@@ -1974,7 +1927,7 @@ class App {
     return url ? url.replace(/_\d+\.jpg/, '_600.jpg') : null;
   }
 
-  // Helper per concorrenza
+  // Concurrency helper
   async _processConcurrency(items, limit, asyncFn, onProgress) {
     let index = 0;
     let completed = 0;
@@ -2048,7 +2001,7 @@ class App {
     }
   }
 
-  // DOWNLOAD ALBUM VELOCE (CONCORRENZA)
+  // FAST ALBUM DOWNLOAD (CONCURRENCY)
   async downloadAlbumUI(albumId) {
     let album, tracks;
     try {
@@ -2080,7 +2033,7 @@ class App {
       const zip = new JSZip();
       const q   = this._settings.downloadQuality;
 
-      // Usiamo il worker concorrente per scaricare (3 alla volta)
+      // Use the concurrent worker to download (3 at a time)
       await this._processConcurrency(tracks, 3, async (track, idx) => {
          
          const data = await getStreamUrl(track.id || track.originalId, q);
@@ -2115,7 +2068,7 @@ class App {
          zip.file(filename, finalBlob);
 
       }, (completed, total) => {
-         // Aggiorna Dialog con calcolo preciso della percentuale
+         // Update the dialog with an exact percentage
          dlg.update(completed, total); 
       });
 
@@ -2136,7 +2089,7 @@ class App {
     }
   }
 
-  // DOWNLOAD PLAYLIST VELOCE (CONCORRENZA)
+  // FAST PLAYLIST DOWNLOAD (CONCURRENCY)
   async downloadPlaylistUI(playlistId) {
     if (!playlistId) return;
 
@@ -2181,7 +2134,7 @@ class App {
       const zip = new JSZip();
       const q   = this._settings.downloadQuality;
 
-      // Concorrenza: 3 download paralleli
+      // Concurrency: 3 parallel downloads
       await this._processConcurrency(tracks, 3, async (track, idx) => {
           
           const data    = await getStreamUrl(track.id || track.originalId, q);
@@ -2198,7 +2151,7 @@ class App {
           let ext = (q === '5') ? 'mp3' : 'flac';
           if (data.url && data.url.includes('.mp3')) ext = 'mp3';
 
-          // Usa idx per dare un ordine se manca trackNumber
+          // Use idx to provide an order if trackNumber is missing
           const trackNum = String(track.trackNumber || idx + 1).padStart(2, '0');
           const filename = `${trackNum} - ${track.artist?.name || 'Unknown'} - ${track.title}.${ext}`
                             .replace(/[/\\?%*:|"<>]/g, '-');
@@ -2249,14 +2202,14 @@ class App {
     let localBytes = 0;
     let mediaBytes = 0;
 
-    // Calcoliamo SOLO il peso delle stringhe testuali nel localStorage
+    // Only count the weight of the text strings in localStorage
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key  = localStorage.key(i) || '';
         const val  = localStorage.getItem(key) || '';
-        const size = (key.length + val.length) * 2; // JS usa 2 byte per carattere
+        const size = (key.length + val.length) * 2; // JS uses 2 bytes per character
         
-        // Se è un link testuale delle cover (o futuri link audio)
+        // If it is a text link to covers (or future audio links)
         if (key.startsWith('apple_cache_') || key.startsWith('audio_link_')) {
           mediaBytes += size;
         } else {
@@ -2272,83 +2225,15 @@ class App {
 
     if (badgeMedia) {
       badgeMedia.textContent = formatBytes(mediaBytes);
-      // Dato che ora sono solo pochi KB, il badge sarà sempre verde (ok)
+      // Since this is now only a few KB, the badge will always be green (ok)
       badgeMedia.className   = 'cache-badge cache-badge-ok';
     }
   }
 
-  /*async toggleMiniMode() {
-    const shell = document.getElementById('shell');
-    if (!shell) return;
-
-    const enteringMini = !shell.classList.contains('mini-mode');
-    const api = window.electronAPI;
-
-    if (enteringMini) {
-      // 1. Salva le dimensioni attuali prima di rimpicciolire
-      if (api?.getBounds) {
-        const bounds = await api.getBounds();
-        if (bounds && !this._isMiniMode) {
-          this._prevBounds = { w: bounds.width, h: bounds.height };
-        }
-      }
-
-      this._isMiniMode = true;
-
-      // 2. Calcola le dimensioni del Mini Player
-      const miniBounds = JSON.parse(localStorage.getItem('mini_player_bounds') || 'null');
-      
-      // FIX: Il Math.max adesso è 300, così rispetta il tuo 374 di default e 
-      // ti permette di stringere la finestra salvando le dimensioni correttamente.
-      const miniW = Math.max(300, Math.min(miniBounds?.w || 368, 520));
-      const miniH = Math.max(300, Math.min(miniBounds?.h || 374, 860));
-
-      // 3. Abbassa il limite del sistema operativo PRIMA di ridimensionare
-      if (api?.setMinimumSize) api.setMinimumSize(300, 300);
-      if (api?.setResizable) api.setResizable(true);
-
-      // 4. Applica il ridimensionamento
-      if (api?.resizeWindow) {
-        api.resizeWindow(miniW, miniH);
-        setTimeout(() => api.resizeWindow(miniW, miniH), 30);
-      }
-
-      shell.classList.add('mini-mode');
-      document.getElementById('mini-mode-btn')?.classList.add('active');
-      
-    } else {
-      
-      // --- RITORNO AL PLAYER NORMALE ---
-      this._isMiniMode = false;
-
-      shell.classList.remove('mini-mode');
-      document.getElementById('mini-mode-btn')?.classList.remove('active');
-
-      // 1. Alza il limite del sistema operativo per la finestra grande
-      if (api?.setMinimumSize) api.setMinimumSize(600, 600);
-      if (api?.setResizable) api.setResizable(true);
-
-      // 2. Recupera le dimensioni precedenti o usa il default
-      const b = this._prevBounds || { w: 1090, h: 701 };
-      
-      if (api?.resizeWindow) {
-        api.resizeWindow(b.w, b.h);
-        
-        // FIX: Inseriamo il centerWindow dentro il delay per assicurarci 
-        // che il ridimensionamento sia completato prima di centrare
-        setTimeout(() => {
-          api.resizeWindow(b.w, b.h);
-          if (api?.centerWindow) api.centerWindow();
-        }, 30);
-      }
-    }
-  }*/
-
-  async toggleMiniMode() {
-    // Comunica ad Electron di aprire o chiudere la seconda finestra
+async toggleMiniMode() {
+    // Tell Electron to open or close the second window
     if (window.electronAPI && window.electronAPI.toggleMiniWindow) {
       window.electronAPI.toggleMiniWindow();
-      //document.getElementById('mini-mode-btn')?.classList.toggle('active');
     } else {
       console.warn('Error');
     }
@@ -2401,7 +2286,7 @@ class App {
           track.album?.title || '',
           track.duration || 0
         );
-        // FIX RESTORE TIME: Se c'era un tempo pendente dal restore sessione, applicalo ora
+        // Restore time: if a time was pending from the session restore, apply it now
         if (this._pendingRestoreTime !== null) {
             if (window.player.audio) {
                 window.player.audio.currentTime = this._pendingRestoreTime;
@@ -2439,13 +2324,12 @@ class App {
       toast('Playback error: ' + (e.message || 'Unknown error'), 'error');
     });
 
-
-    // Funzione principale che spedisce i dati e l'oggetto TRACK al Mini Player
+// Main function that sends the data and the TRACK object to the Mini Player
     const syncToMini = () => {
       if (!window.electronAPI || !window.electronAPI.syncToMini) return;
       const t = player.currentTrack;
       
-      // Estraiamo il testo
+      // Extract the text
       let lyricsHtml = `<div class="mini-lyrics-empty">Testo non disponibile.</div>`;
       const fsLyrics = document.getElementById('fs-lyrics');
       if (fsLyrics) {
@@ -2459,7 +2343,7 @@ class App {
         }
       }
 
-      // Spediamo i dati assemblati via IPC
+      // Send the assembled data via IPC
       window.electronAPI.syncToMini({
         isPlaying: window.player.audio && !window.player.audio.paused,
         title: t ? t.title : 'No track',
@@ -2468,17 +2352,17 @@ class App {
         currentTime: window.player.audio ? window.player.audio.currentTime : 0,
         duration: t ? (t.duration || 1) : 1,
         lyricsHtml: lyricsHtml,
-        track: t, // PASSAGGIO CHIAVE: inviamo l'intero oggetto traccia
+        track: t, // KEY STEP: send the whole track object
         animatedCovers: this._settings.animatedCovers
       });
     };
 
-    // Agganciamo i listener per aggiornare in tempo reale
+    // Attach listeners to update in real time
     player.on('timeupdate', syncToMini);
     player.on('state', syncToMini);
-    player.on('trackchange', syncToMini); // Richiama semplicemente il sync quando cambi brano
+    player.on('trackchange', syncToMini); // Just call sync again when the track changes
 
-    // ASCOLTA I COMANDI IN ARRIVO DAL MINI PLAYER
+    // LISTEN FOR COMMANDS COMING FROM THE MINI PLAYER
     if (window.electronAPI && window.electronAPI.onMiniAction) {
       window.electronAPI.onMiniAction((action, payload) => {
         switch (action) {
@@ -2495,7 +2379,7 @@ class App {
   _updateNowPlaying(track) {
     if (!track) return;
 
-    // Identifica se è un file locale
+    // Detect whether it is a local file
     const isLocal = track.is_local || String(track.id).startsWith('local_');
 
     const title      = track.title || '—';
@@ -2511,7 +2395,7 @@ class App {
       viewLyrics.style.setProperty('--lyrics-bg', cover ? `url('${cover}')` : 'none');
     }
 
-    // 1. PLAYER: Gestione click sull'artista
+    // 1. PLAYER: artist click handling
     const artistEl = document.getElementById('now-artist');
     if (artistId && !isLocal) {
       artistEl.innerHTML = `<span class="hero-artist-link" style="cursor:pointer;display:inline-block;" onclick="window.app.navigate('artist','${artistId}')">${escHtml(artistName)}</span>`;
@@ -2519,14 +2403,7 @@ class App {
       artistEl.textContent = artistName;
     }
 
-    /* 2. PLAYER: Nascondi i 3 puntini e "Aggiungi a playlist" per file locali
-    document.querySelectorAll('.now-action-btn').forEach(btn => {
-      if (btn.textContent.includes('⋯') || btn.title === 'More' || btn.title === 'Add to Playlist') {
-        btn.style.display = isLocal ? 'none' : '';
-      }
-    });*/
-
-    const artEl = document.getElementById('now-art');
+const artEl = document.getElementById('now-art');
     artEl.innerHTML = `
       ${cover ? `<img src="${cover}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` : `<div class="now-art-placeholder">♪</div>`}
       <div class="now-art-overlay">
@@ -2539,8 +2416,6 @@ class App {
     const miniVideo  = document.getElementById('mini-video-art');
 
     if (this._settings.animatedCovers) {
-      //if (nowVideo) coverVideoManager.play(nowVideo, track, 'square');
-      //if (miniVideo) coverVideoManager.play(miniVideo, track, 'square');
     } else {
       if (nowVideo) coverVideoManager.stop(nowVideo);
       if (miniVideo) coverVideoManager.stop(miniVideo);
@@ -2566,9 +2441,9 @@ class App {
         specsEl.textContent = 'MP3 • 320 KBPS';
         specsEl.style.color = 'var(--text3)';
       } else {
-        const formatName = depth >= 24 && sr > 48.0 ? 'HI-RES' : 'FLAC';
+        const formatName = depth >= 24 && sr >= 44.1 || sr > 48.0 ? 'HI-RES' : 'FLAC';
         specsEl.textContent = `${formatName} • ${depth}-BIT / ${sr} kHz`;
-        specsEl.style.color = depth >= 24 && sr > 48.0 ? 'var(--gold2)' : 'var(--text2)';
+        //specsEl.style.color = depth >= 24 && sr > 48.0 ? 'var(--gold2)' : 'var(--text2)';
       }
     }
 
@@ -2576,12 +2451,12 @@ class App {
       maxQ = 5; badgeText = 'MP3';
     } else if (depth >= 24) {
       if (sr > 48.0) { maxQ = 27; badgeText = 'HI-RES ✦'; }
-      else           { maxQ = 7;  badgeText = '24BIT';    }
+      else           { maxQ = 7;  badgeText = 'HI-RES ✦'; }
     } else {
       maxQ = 6; badgeText = 'LOSSLESS';
     }
 
-    // 3. SELETTORE QUALITÀ
+    // 3. QUALITY SELECTOR
     const drop = document.getElementById('quality-picker-btn');
     if (drop) {
       let userQ   = parseInt(this._settings.quality || '27');
@@ -2600,7 +2475,7 @@ class App {
       else if (actualQ === 6)  drop.classList.add('q-lossless');
       else                     drop.classList.add('q-mp3');
 
-      // Blocca il selettore se il file è locale
+      // Lock the selector if the file is local
       if (isLocal) {
         drop.style.pointerEvents = 'none';
         drop.style.opacity = '0.6';
@@ -2628,7 +2503,7 @@ class App {
     const fsTitle = document.getElementById('fs-title');
     if (fsTitle) fsTitle.textContent = title;
 
-    // 4. FULLSCREEN: Rimuovi click su Artista
+    // 4. FULLSCREEN: remove the click on the artist
     const fsArtist = document.getElementById('fs-artist');
     if (fsArtist) {
       fsArtist.innerHTML = (artistId && !isLocal)
@@ -2636,7 +2511,7 @@ class App {
         : escHtml(artistName);
     }
 
-    // 5. FULLSCREEN: Rimuovi click su Album
+    // 5. FULLSCREEN: remove the click on the album
     const fsAlbum = document.getElementById('fs-album');
     const fsDot   = document.querySelector('.fs-dot');
     if (fsAlbum) {
@@ -2666,19 +2541,6 @@ class App {
     const fsQuality = document.getElementById('fs-quality-label');
     if (fsQuality) {
       fsQuality.textContent = badgeText;
-      if (maxQ === 27) {
-        fsQuality.style.color        = 'var(--gold)';
-        fsQuality.style.background   = 'rgba(212,168,83,0.05)';
-        fsQuality.style.borderColor  = 'rgba(212,168,83,0.3)';
-      } else if (maxQ === 7) {
-        fsQuality.style.color        = '#4FC3F7';
-        fsQuality.style.background   = 'rgba(79,195,247,0.05)';
-        fsQuality.style.borderColor  = 'rgba(79,195,247,0.3)';
-      } else {
-        fsQuality.style.color        = 'var(--text2)';
-        fsQuality.style.background   = 'rgba(255,255,255,0.04)';
-        fsQuality.style.borderColor  = 'rgba(255,255,255,0.1)';
-      }
     }
 
     const fsBg = document.getElementById('fs-bg');
@@ -2689,7 +2551,7 @@ class App {
     fsArt.style.position = 'relative';
     fsArt.style.overflow = 'hidden';
 
-    // Prepara il nuovo tag immagine statica
+    // Prepare the new static image tag
     const newImgHtml = cover
       ? `<img src="${cover.replace("_600.jpg","_org.jpg")}" style="width:100%;height:100%;object-fit:cover;" draggable="false">`
       : `<div class="fs-art-placeholder">♪</div>`;
@@ -2697,46 +2559,46 @@ class App {
     let fsVideo = document.getElementById('fs-video-art');
 
     if (this._settings.animatedCovers) {
-      // Chiediamo l'ID Apple del nuovo brano/album
+      // Ask for the Apple ID of the new track/album
       const artist = track.artist?.name || track.performer?.name || '';
       let albumTitle = track.album?.title || track.album_title || '';
       
-      // Se non esiste ancora il video nel DOM, creiamolo
+      // If the video does not exist in the DOM yet, create it
       if (!fsVideo) {
         fsArt.innerHTML = newImgHtml + `<video id="fs-video-art" autoplay loop muted playsinline crossorigin="anonymous" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;"></video>`;
         fsVideo = document.getElementById('fs-video-art');
       } else {
-        // Aggiorna o inserisce l'immagine statica di sfondo
+        // Update or insert the static background image
         const existingImg = fsArt.querySelector('img, .fs-art-placeholder');
         if (existingImg) existingImg.outerHTML = newImgHtml;
         else fsArt.insertAdjacentHTML('afterbegin', newImgHtml);
       }
 
-      // Avvia la ricerca della cover animata per il nuovo brano
+      // Start looking up the animated cover for the new track
       getAppleAlbumId(artist, albumTitle).then(appleIds => {
         if (appleIds && appleIds.length > 0) {
           getAnimatedArtwork(appleIds, 'square').then(videoUrl => {
             if (videoUrl) {
-              // Se il video trovato è diverso da quello attualmente in riproduzione, ricaricalo
+              // If the video found differs from the one currently playing, reload it
               if (fsVideo.dataset.videoSrc !== videoUrl) {
                 fsVideo.dataset.videoSrc = videoUrl;
                 coverVideoManager.play(fsVideo, track, 'square');
               }
             } else {
-              // Se la traccia nuova NON ha la cover animata, ferma e pulisci la precedente
+              // If the new track does NOT have an animated cover, stop and clear the previous one
               coverVideoManager.stop(fsVideo);
               fsVideo.dataset.videoSrc = '';
             }
           });
         } else {
-          // Nessun riscontro su Apple Music, spegni il video animato precedente
+          // No match on Apple Music: turn off the previous animated video
           coverVideoManager.stop(fsVideo);
           fsVideo.dataset.videoSrc = '';
         }
       });
 
     } else {
-      // Se le cover animate sono disattivate nelle impostazioni
+      // If animated covers are disabled in settings
       if (fsVideo) coverVideoManager.stop(fsVideo);
       fsArt.innerHTML = newImgHtml;
     }
@@ -2772,15 +2634,15 @@ class App {
     checkMarquee();
     document.title = `${title} — ${artistName}${versionSuffix}`;
 	
-	  //Discord
+	  // Discord
     if (this._settings.discordRPC && window.electronAPI?.updateDiscordRPC) {
-      // Discord RPC non supporta URL base64 o blob. Usa un fallback se il file è locale.
+      // Discord RPC does not support base64 or blob URLs. Use a fallback if the file is local.
 
       const defaultImage ="no-cover";
 
       let discordCover = cover || defaultImage;
       if (discordCover.startsWith('data:') || discordCover.startsWith('blob:')) {
-        discordCover = defaultImage; // Sostituisci con l'icona di default della tua app
+        discordCover = defaultImage; // Replace with your app's default icon
       }
       
       window.electronAPI.updateDiscordRPC({
@@ -2791,9 +2653,8 @@ class App {
         duration:   track.duration
       });
     }
-	
-    
-    const fsMore = document.getElementById('fs-more-btn');
+
+const fsMore = document.getElementById('fs-more-btn');
     if (fsMore) {
       fsMore.onclick = (e) => {
         e.stopPropagation();
@@ -2809,17 +2670,16 @@ class App {
 
   }
 
-
-  _extractColor(imgUrl) {
+_extractColor(imgUrl) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    // Parametro fittizio per forzare il bypass della cache CORS
+    // Dummy parameter to force bypassing the CORS cache
     img.src = imgUrl + (imgUrl.includes('?') ? '&' : '?') + 'nocache=' + Date.now();
     
     img.onload = () => {
       try {
         const c = document.createElement('canvas');
-        // Aumentiamo leggermente la risoluzione per una precisione migliore
+        // Slightly increase the resolution for better accuracy
         c.width = c.height = 32; 
         const ctx = c.getContext('2d');
         ctx.drawImage(img, 0, 0, 32, 32);
@@ -2832,18 +2692,18 @@ class App {
         for (let i = 0; i < d.length; i += 4) {
           let pr = d[i], pg = d[i+1], pb = d[i+2], pa = d[i+3];
           
-          // Ignora pixel trasparenti
+          // Ignore transparent pixels
           if (pa < 128) continue; 
 
           let max = Math.max(pr, pg, pb);
           let min = Math.min(pr, pg, pb);
           let brightness = (max + min) / 2;
-          let saturation = max - min; // Da 0 a 255
+          let saturation = max - min; // From 0 to 255
 
-          // Ignora i neri assoluti e i bianchi sparati
+          // Ignore pure blacks and blown-out whites
           if (brightness < 20 || brightness > 235) continue;
 
-          // Raggruppa colori simili (step di 24)
+          // Group similar colors (step of 24)
           let step = 24;
           let rBin = Math.floor(pr / step);
           let gBin = Math.floor(pg / step);
@@ -2859,13 +2719,13 @@ class App {
           colorMap[key].sat += saturation;
         }
 
-        // Trova il colore vincitore
+        // Find the winning color
         for (let key in colorMap) {
           let bucket = colorMap[key];
           
-          // La magia: diamo un punteggio basato su quanto è frequente MA ANCHE su quanto è saturo
+          // Score based on how frequent the color is AND how saturated it is
           let avgSat = bucket.sat / bucket.count;
-          let score = bucket.count * (avgSat + 15); // +15 evita di azzerare del tutto i grigi se l'album è in bianco e nero
+          let score = bucket.count * (avgSat + 15); // +15 avoids zeroing out greys entirely if the album is black and white
 
           if (score > bestScore) {
             bestScore = score;
@@ -2875,7 +2735,7 @@ class App {
           }
         }
 
-        // Fallback di sicurezza se la copertina è 100% nera o bianca
+        // Safety fallback if the cover is 100% black or white
         if (bestScore === 0) { r = 80; g = 80; b = 80; }
         
         const root = document.documentElement;
@@ -2883,10 +2743,10 @@ class App {
         root.style.setProperty('--dyn-g', g);
         root.style.setProperty('--dyn-b', b);
         
-        // Calcolo della luminosità (YIQ)
+        // Luminance calculation (YIQ)
         let brightness = (r * 299 + g * 587 + b * 114) / 1000;
         
-        // Se la luminosità è alta (es. > 150), aggiungiamo la classe per testi scuri
+        // If luminance is high (e.g. > 150), add the class for dark text
         if (brightness > 154) {
           document.body.classList.add('dynamic-light-bg');
         } else {
@@ -2896,7 +2756,7 @@ class App {
         document.body.classList.add('dynamic-color-active');
 
       } catch (err) {
-        console.warn('Dynamic Color: Impossibile leggere i pixel (blocco CORS).', err);
+        console.warn('Dynamic Color: Unable to read pixels (CORS block)', err);
       }
     };
   }
@@ -2907,11 +2767,11 @@ class App {
     root.style.setProperty('--dyn-g', '132');
     root.style.setProperty('--dyn-b', '58');
     
-    // Rimuove ENTRAMBE le classi dal body per disattivare tutto all'istante
+    // Remove BOTH classes from the body to turn everything off instantly
     document.body.classList.remove('dynamic-color-active');
     document.body.classList.remove('dynamic-light-bg');
 
-    // Resetta anche l'hero
+    // Also reset the hero
     const heroSection = document.querySelector('.hero-section');
     if (heroSection) heroSection.style.removeProperty('--hero-dyn-color');
   }
@@ -3011,7 +2871,7 @@ class App {
     });
   }
 
-  // ── TOUCH SUPPORT PER MOBILE ─────────────────────────────────
+  // ── TOUCH SUPPORT FOR MOBILE ─────────────────────────────────
   _initMobileTouchBars() {
     const bindTouch = (trackId, fillId, thumbId, callback) => {
       const track = document.getElementById(trackId);
@@ -3072,7 +2932,7 @@ class App {
   toggleFullscreen() {
     const overlay = document.getElementById('fullscreen-overlay');
     
-    if (overlay.classList.contains('open')) return; //se è aperto e si preme il tasto f nuovamente non lo chiude
+    if (overlay.classList.contains('open')) return; // if it is already open, pressing the F key again does not close it
     
     overlay.classList.toggle('open');
     if (overlay.classList.contains('open')) {
@@ -3081,7 +2941,7 @@ class App {
          const track = window.player.currentTrack;
          const currentAlbumId = track.album?.id || track.album?.album_id || track.album_id || 'unknown';
          
-         // Avvia la riproduzione solo se il video è nuovo, se è un nuovo album o se non era visibile
+         // Start playback only if the video is new, if it is a new album or if it was not visible
          if (fsVideo.style.opacity === '0' || fsVideo.dataset.albumId !== String(currentAlbumId)) {
              fsVideo.dataset.albumId = String(currentAlbumId);
              coverVideoManager.play(fsVideo, track, 'square');
@@ -3125,7 +2985,7 @@ class App {
   async _doClearCache() {
     removeModal();
     try {
-      // Elimina SOLO i link testuali salvati per le cover animate e gli stream
+      // Delete ONLY the text links saved for animated covers and streams
       const keysToDelete = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
@@ -3148,7 +3008,7 @@ class App {
 window.app    = new App();
 window.player = player;
 
-//Apple music
+// Apple Music
 window.appleImporter = AppleImporter;
 
 // ── Mini Player ───────────────────────────────────────────────
@@ -3173,7 +3033,6 @@ window.appleImporter = AppleImporter;
         <button id="mini-lyrics-btn" class="mini-top-btn" type="button" title="Lyric">${SVG_LYRICS}</button>
         <button id="mini-expand-btn-top" class="mini-top-btn" type="button" title="Normal screen">${SVG_EXPAND}</button>
       `;
-      //miniBar.appendChild(top);
       miniBar.insertBefore(top, miniBar.firstChild);
     }
 
@@ -3183,7 +3042,7 @@ window.appleImporter = AppleImporter;
       panel.innerHTML = `
         <div id="mini-lyrics-scroll">
           <div id="mini-lyrics-content">
-            <div class="mini-lyrics-empty">Testo non disponibile.</div>
+            <div class="mini-lyrics-empty">Text not available</div>
           </div>
         </div>
       `;
@@ -3370,6 +3229,5 @@ window.appleImporter = AppleImporter;
     boot();
   }
 })();
-
 
 export { App };

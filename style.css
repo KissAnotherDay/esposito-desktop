@@ -1,52 +1,52 @@
 /* ═══════════════════════════════════════════════════════
-   TOKENS — variabili globali
+   TOKENS — global variables
 ═══════════════════════════════════════════════════════ */
 
 :root {
-  /* Sfondi */
-  --bg: #070707;
-  --bg1: #0b0b0c;
-  --bg2: #121214;
-  --bg3: #1b1b1f;
-  --bg4: #29282d;
-  --surface-glass: rgba(18, 18, 20, .72);
-  --surface-glass-strong: rgba(24, 24, 28, .88);
+  /* Backgrounds */
+  --bg: #07070c;
+  --bg1: #0b0b12;
+  --bg2: #11111a;
+  --bg3: #1a1a26;
+  --bg4: #272736;
+  --surface-glass: rgba(17, 17, 26, .72);
+  --surface-glass-strong: rgba(23, 23, 34, .88);
 
-  /* Bordi */
+  /* Borders */
   --border: rgba(255,255,255,.07);
   --border2: rgba(255,255,255,.12);
   --hairline: rgba(255,255,255,.085);
   --hairline-strong: rgba(255,255,255,.16);
 
-  /* Palette oro */
-  --gold: #f0bd61;
-  --gold2: #d8a24e;
-  --gold3: #9b6b28;
-  --goldfaint: rgba(240,189,97,.105);
+  /* Accent palette (variable names kept as --gold* so nothing else breaks) */
+  --gold: #9d8cff;
+  --gold2: #7b6af0;
+  --gold3: #4b3fb0;
+  --goldfaint: rgba(157,140,255,.105);
 
-  /* Testo */
-  --text: #f7f1e8;
-  --text2: #aea79d;
-  --text3: #706a63;
+  /* Text */
+  --text: #f4f4fb;
+  --text2: #a5a8bd;
+  --text3: #6c6f86;
 
-  /* Accenti */
+  /* Accents */
   --red: #c0392b;
   --green: #27ae60;
 
-  /* Dimensioni layout */
+  /* Layout dimensions */
   --sidebar-w: 232px;
   --player-h: 100px;
   --titlebar-h: 48px;
   --queue-w: 288px;
 
-  /* Forme, ombre ed effetti */
+  /* Shapes, shadows and effects */
   --radius: 8px;
   --radius-lg: 14px;
   --shadow-sm: 0 6px 18px rgba(0,0,0,.28);
   --shadow-md: 0 18px 48px rgba(0,0,0,.42);
   --shadow-lg: 0 34px 90px rgba(0,0,0,.62);
-  --ring: 0 0 0 3px rgba(240,189,97,.18);
-  --glow-gold: 0 0 0 1px rgba(212,168,83,.16), 0 18px 46px rgba(212,168,83,.08);
+  --ring: 0 0 0 3px rgba(157,140,255,.18);
+  --glow-gold: 0 0 0 1px rgba(123,106,240,.16), 0 18px 46px rgba(123,106,240,.08);
   --panel-blur: blur(22px) saturate(1.18);
   --transition: .2s cubic-bezier(.2,.8,.2,1);
   --press-scale: .975;
@@ -56,7 +56,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   ANIMAZIONI
+   ANIMATIONS
 ═══════════════════════════════════════════════════════ */
 
 @keyframes shimmer {
@@ -451,7 +451,7 @@ img {
 }
 
 /* ═══════════════════════════════════════════════════════
-   TIPOGRAFIA & SEZIONI
+   TYPOGRAPHY & SECTIONS
 ═══════════════════════════════════════════════════════ */
 
 .section-hdr {
@@ -538,7 +538,7 @@ img {
   inset: 0;
   pointer-events: none;
   opacity: 0;
-  background: linear-gradient(135deg, rgba(212,168,83,.1) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(123,106,240,.1) 0%, transparent 60%);
   transition: opacity .3s;
 }
 
@@ -568,7 +568,7 @@ img {
 }
 
 .card-play-btn:hover {
-  background: #e8b96a;
+  background: #b3a6ff;
   transform: scale(1.06) translateY(0) !important;
 }
 
@@ -640,7 +640,7 @@ img {
   color: var(--gold);
 }
 
-/* ── Cella numero ── */
+/* ── Number cell ─── */
 
 .track-num-cell {
   display: flex;
@@ -656,7 +656,7 @@ img {
   transition: opacity 0.15s;
 }
 
-/* ── Senza cover ── */
+/* ── Without cover ── */
 
 .track-num-wrap {
   position: relative;
@@ -672,7 +672,7 @@ img {
   transition: opacity 0.15s;
 }
 
-/* is-playing: numero → dot */
+/* is-playing: number → dot */
 
 .track-row.is-playing .track-num-wrap .track-num {
   opacity: 0;
@@ -690,7 +690,7 @@ img {
   pointer-events: none;
 }
 
-/* hover: nasconde tutto, mostra play */
+/* hover: hides everything, shows play */
 
 .track-row:hover .track-num-wrap .track-num {
   opacity: 0;
@@ -722,7 +722,7 @@ img {
   color: var(--gold);
 }
 
-/* ── Con cover ── */
+/* ── With cover ── */
 
 .track-mini-art {
   position: relative;
@@ -756,13 +756,13 @@ img {
   z-index: 1;
 }
 
-/* hover: mostra triangolo */
+/* hover: shows the triangle */
 
 .track-row:hover .track-mini-art .track-play-icon {
   opacity: 1;
 }
 
-/* is-playing: nascondi triangolo, mostra dot */
+/* is-playing: hide the triangle, show the dot */
 
 .track-row.is-playing .track-mini-art .track-play-icon {
   opacity: 1;
@@ -782,7 +782,7 @@ img {
   animation: pulseDot 1.2s ease-in-out infinite;
 }
 
-/* hover su is-playing: nasconde dot, mostra triangolo */
+/* hover on is-playing: hides the dot, shows the triangle */
 
 .track-row.is-playing:hover .track-mini-art .track-play-icon::after {
   display: none;
@@ -792,7 +792,7 @@ img {
   display: block;
 }
 
-/* Z-index per non essere coperti */
+/* Z-index so they are not covered */
 
 .track-more-btn,
 .explicit-badge {
@@ -800,7 +800,7 @@ img {
   z-index: 2;
 }
 
-/* ── Testi brano ── */
+/* ── Track text ─── */
 
 .track-info {
   min-width: 0;
@@ -854,7 +854,7 @@ img {
 }
 
 .track-quality-badge.hires {
-  background: rgba(212,168,83,.12);
+  background: rgba(123,106,240,.12);
   color: var(--gold2);
 }
 
@@ -963,7 +963,7 @@ img {
   position: absolute;
   inset: -20px;
   z-index: -1;
-  background: radial-gradient(circle at 50% 50%, rgba(212,168,83,.2), transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(123,106,240,.2), transparent 70%);
   filter: blur(20px);
 }
 
@@ -1047,11 +1047,11 @@ img {
   font-size: 13px;
   font-weight: 600;
   transition: background var(--transition), transform .1s;
-  box-shadow: 0 4px 20px rgba(212,168,83,.3);
+  box-shadow: 0 4px 20px rgba(123,106,240,.3);
 }
 
 .btn-play-hero:hover {
-  background: #e8b96a;
+  background: #b3a6ff;
   transform: scale(1.03);
 }
 
@@ -1108,7 +1108,7 @@ img {
 }
 
 /* ═══════════════════════════════════════════════════════
-   HERO — Artista
+   HERO — Artist
 ═══════════════════════════════════════════════════════ */
 
 .artist-hero-section {
@@ -1133,7 +1133,7 @@ img {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,.5) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(7,7,9,1) 0%, rgba(7,7,9,.5) 50%, transparent 100%);
 }
 
 .artist-hero-content {
@@ -1266,7 +1266,7 @@ img {
 .featured-hero-grad {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(8,8,8,.9) 0%, rgba(8,8,8,.4) 50%, transparent 100%);
+  background: linear-gradient(to right, rgba(7,7,9,.9) 0%, rgba(7,7,9,.4) 50%, transparent 100%);
 }
 
 .featured-hero-content {
@@ -1500,7 +1500,7 @@ img {
   height: 24px;
   margin-top: -12px;
   margin-left: -12px;
-  border: 2.5px solid rgba(8,8,8,.15);
+  border: 2.5px solid rgba(7,7,9,.15);
   border-top-color: var(--bg);
   border-radius: 50%;
   opacity: 0;
@@ -1513,7 +1513,7 @@ img {
   animation: spin 0.8s linear infinite;
 }
 
-/*AREA CLICCABILE DEL PLAYER*/
+/* PLAYER CLICKABLE AREA */
 
 .seekbar-area {
   display: flex;
@@ -2380,7 +2380,7 @@ img {
 }
 
 /* ═══════════════════════════════════════════════════════
-   BOTTONI GENERICI
+   GENERIC BUTTONS
 ═══════════════════════════════════════════════════════ */
 
 .btn {
@@ -2402,7 +2402,7 @@ img {
 }
 
 .btn-primary:hover {
-  background: #e8b96a;
+  background: #b3a6ff;
 }
 
 .btn-ghost {
@@ -2463,8 +2463,12 @@ img {
   color: var(--gold);
 }
 
+#fs-content-wrap .fs-ctrl-btn.active {   /* riga ~4949 */
+  color: var(--gold);
+}
+
 /* ═══════════════════════════════════════════════════════
-   SETTINGS DINAMICI — classi su <body>
+   DYNAMIC SETTINGS — classes on <body>
 ═══════════════════════════════════════════════════════ */
 
 body.hide-explicit .explicit-badge {
@@ -2575,7 +2579,7 @@ button img,
 .lyric-line.active {
   color: var(--gold);
   transform: scale(1);
-  text-shadow: 0 0 25px rgba(212,168,83, 0.4);
+  text-shadow: 0 0 25px rgba(123,106,240, 0.4);
   opacity: 1;
 }
 
@@ -2650,7 +2654,7 @@ button img,
   -webkit-app-region: drag !important;
 }
 
-/* nasconde il player normale quando sei in mini mode */
+/* hides the normal player when in mini mode */
 
 .mini-mode #player-bar > *:not(#mini-bar) {
   display: none !important;
@@ -2685,7 +2689,7 @@ button img,
   flex-direction: column;
 }
 
-/* elementi cliccabili */
+/* clickable elements */
 
 #mini-bar button,
 #mini-bar input,
@@ -2696,7 +2700,6 @@ button img,
 #mini-bar .mini-overlay-btn,
 #mini-bar .mini-overlay-play,
 #mini-bar #mini-seek,
-#mini-bar #mini-art-overlay,
 #mini-bar #mini-info,
 #mini-bar #mini-top-actions,
 #mini-bar .mini-top-btn,
@@ -2705,7 +2708,7 @@ button img,
   -webkit-app-region: no-drag;
 }
 
-/* barra drag vera */
+/* actual drag bar */
 
 #mini-drag-strip {
   position: absolute;
@@ -2719,7 +2722,7 @@ button img,
   justify-content: center;
   -webkit-app-region: drag;
   pointer-events: auto;
-  background: linear-gradient(180deg, rgba(8,8,8,.78), rgba(8,8,8,.22));
+  background: linear-gradient(180deg, rgba(7,7,9,.78), rgba(7,7,9,.22));
   border-bottom: 1px solid rgba(255,255,255,.06);
   backdrop-filter: blur(10px);
 }
@@ -2768,9 +2771,10 @@ button img,
   pointer-events: none;
 }
 
-/* controlli centrali */
+/* center controls */
 
 #mini-art-overlay {
+  -webkit-app-region: drag; /* empty space around the buttons drags the window; buttons stay no-drag */
   position: absolute;
   inset: 34px 0 0 0;
   display: flex;
@@ -2783,7 +2787,8 @@ button img,
   z-index: 30;
 }
 
-#mini-art-wrap:hover #mini-art-overlay {
+#mini-art-wrap:hover #mini-art-overlay,
+body.ui-on #mini-art-overlay {
   opacity: 1;
   background: rgba(0,0,0,.28);
 }
@@ -2829,7 +2834,7 @@ button img,
   transform: scale(1.06);
 }
 
-/* bottoni in alto a destra */
+/* top-right buttons */
 
 #mini-top-actions {
   position: absolute;
@@ -2848,7 +2853,7 @@ button img,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(10,10,10,.55);
+  background: rgba(9,8,12,.55);
   border: 1px solid rgba(255,255,255,.08);
   color: #fff;
   backdrop-filter: blur(10px);
@@ -2858,18 +2863,18 @@ button img,
 }
 
 .mini-top-btn:hover {
-  background: rgba(20,20,20,.78);
+  background: rgba(17,17,23,.78);
   border-color: rgba(255,255,255,.18);
   transform: scale(1.06);
 }
 
 .mini-top-btn.active {
   color: var(--gold);
-  border-color: rgba(212,168,83,.32);
-  background: rgba(212,168,83,.12);
+  border-color: rgba(123,106,240,.32);
+  background: rgba(123,106,240,.12);
 }
 
-/* info brano */
+/* track info */
 
 #mini-info {
   position: absolute;
@@ -2882,7 +2887,7 @@ button img,
   gap: 3px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(12,12,12,.78), rgba(12,12,12,.56));
+  background: linear-gradient(180deg, rgba(10,10,14,.78), rgba(10,10,14,.56));
   border: 1px solid rgba(255,255,255,.07);
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 30px rgba(0,0,0,.25);
@@ -2915,13 +2920,13 @@ button img,
   max-width: 100%;
 }
 
-/* nasconde la vecchia barra sotto */
+/* hides the old bar below */
 
 #mini-controls {
   display: none !important;
 }
 
-/* pannello testo */
+/* text panel */
 
 #mini-lyrics-panel {
   position: absolute;
@@ -2930,7 +2935,7 @@ button img,
   display: none;
   border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(10,10,10,.82), rgba(10,10,10,.62));
+  background: linear-gradient(180deg, rgba(9,8,12,.82), rgba(9,8,12,.62));
   border: 1px solid rgba(255,255,255,.08);
   backdrop-filter: blur(14px);
   box-shadow: 0 12px 36px rgba(0,0,0,.28);
@@ -2973,7 +2978,7 @@ button img,
 .mini-lyrics-line.active {
   color: var(--gold);
   transform: scale(1.01);
-  text-shadow: 0 0 25px rgba(212,168,83, 0.4);
+  text-shadow: 0 0 25px rgba(123,106,240, 0.4);
   opacity: 1;
 }
 
@@ -3005,10 +3010,10 @@ button img,
 }
 
 /* ═══════════════════════════════════════════════════════
-   HOVER EFFECTS MINI PLAYER
+   MINI PLAYER HOVER EFFECTS
 ═══════════════════════════════════════════════════════ */
 
-/* 1. Nascondiamo di default la barra di drag, i tasti in alto e il riquadro del titolo */
+/* 1. Hide the drag bar, the top buttons and the title box by default */
 
 #mini-drag-strip,
 #mini-info,
@@ -3018,8 +3023,13 @@ button img,
   transition: opacity 0.3s ease-in-out;
 }
 
-/* 2. Mostriamo tutto quando il mouse entra nell'area del Mini Player (#mini-bar) */
+/* 2. Show everything while the cursor is over the Mini Player.
+      body.ui-on is set from the main process (see mini.html) because :hover is lost over
+      -webkit-app-region: drag areas; #mini-bar:hover is kept as a fallback. */
 
+body.ui-on #mini-drag-strip,
+body.ui-on #mini-info,
+body.ui-on #mini-top-actions,
 #mini-bar:hover #mini-drag-strip,
 #mini-bar:hover #mini-info,
 #mini-bar:hover #mini-top-actions {
@@ -3027,7 +3037,7 @@ button img,
   pointer-events: auto;
 }
 
-/* 3. Assicuriamoci che il cursore della "manina" funzioni bene sulla barra di drag quando è visibile */
+/* 3. Make sure the "hand" cursor works well on the drag bar when it is visible */
 
 #mini-drag-strip {
   cursor: grab !important;
@@ -3037,21 +3047,22 @@ button img,
   cursor: grabbing !important;
 }
 
-/* 4. ECCEZIONE FONDAMENTALE: Se apri il pannello dei testi (Lyrics), 
-      il titolo e il tasto per chiudere devono restare sempre visibili, 
-      anche se sposti il mouse fuori! */
+/* 4. KEY EXCEPTION: if the lyrics panel is open, the drag handle, the title and the
+      buttons must always stay visible and active, so the window can still be moved. */
 
+#mini-bar.show-mini-lyrics #mini-drag-strip,
 #mini-bar.show-mini-lyrics #mini-info,
 #mini-bar.show-mini-lyrics #mini-top-actions {
   opacity: 1 !important;
   pointer-events: auto !important;
 }
 
+
 /* ═══════════════════════════════════════════════════════
-   DYNAMIC COLOR — SISTEMA IMMERSIVO STILE APPLE MUSIC
+   DYNAMIC COLOR — IMMERSIVE APPLE MUSIC-STYLE SYSTEM
 ═══════════════════════════════════════════════════════ */
 
-/* 1. SFONDO IMMERSIVO (Colore acceso su tutta la pagina) */
+/* 1. IMMERSIVE BACKGROUND (vivid color across the whole page) */
 
 body.dynamic-color-active #view-album {
   background-color: var(--bg) !important;
@@ -3060,7 +3071,7 @@ body.dynamic-color-active #view-album {
   transition: background 0.8s ease-in-out, background-color 0.8s ease-in-out;
 }
 
-/* 2. RENDI TRASPARENTE L'AREA DELLA COVER E RIMUOVI I LIMITI */
+/* 2. MAKE THE COVER AREA TRANSPARENT AND REMOVE THE LIMITS */
 
 body.dynamic-color-active #view-album .hero-section {
   background: transparent !important;
@@ -3074,7 +3085,7 @@ body.dynamic-color-active .hero-section::after {
   background: transparent !important;
 }
 
-/* ESPANDI IL VIDEO ANIMATO A TUTTO SCHERMO */
+/* EXPAND THE ANIMATED VIDEO TO FULL SCREEN */
 
 body.dynamic-color-active #view-album #hero-video-bg {
   position: fixed !important;
@@ -3090,7 +3101,7 @@ body.dynamic-color-active #view-album #hero-video-bg {
   z-index: 0 !important;
 }
 
-/* PORTA LA TRACKLIST E I TESTI IN PRIMO PIANO SOPRA IL VIDEO */
+/* BRING THE TRACKLIST AND LYRICS IN FRONT OF THE VIDEO */
 
 body.dynamic-color-active #view-album .hero-content,
 body.dynamic-color-active #view-album .view-padded {
@@ -3098,9 +3109,9 @@ body.dynamic-color-active #view-album .view-padded {
   z-index: 2 !important;
 }
 
-/* 3. FULLSCREEN OVERLAY (Now Playing a tutto schermo) */
+/* 3. FULLSCREEN OVERLAY (full-screen Now Playing) */
 
-/* 6. ELEMENTI ATTIVI E HOVER (SOLO SCHEDA ALBUM) */
+/* 6. ACTIVE AND HOVER ELEMENTS (ALBUM PAGE ONLY) */
 
 body.dynamic-color-active #view-album .track-row.is-playing {
   background: rgba(255, 255, 255, 0.18) !important;
@@ -3117,7 +3128,7 @@ body.dynamic-color-active #view-album .track-row {
   position: relative;
 }
 
-/* 6.5 RIGHE DI SEPARAZIONE */
+/* 6.5 SEPARATOR LINES */
 
 body.dynamic-color-active #view-album .tracklist {
   gap: 0 !important;
@@ -3138,7 +3149,7 @@ body.dynamic-color-active #view-album .track-row:last-child::after {
   display: none !important;
 }
 
-/* 7. TESTI E BADGE (DEFAULT: BIANCO SU SFONDO SCURO) */
+/* 7. TEXT AND BADGES (DEFAULT: WHITE ON DARK BACKGROUND) */
 
 body.dynamic-color-active #view-album .track-artist,
 body.dynamic-color-active #view-album .track-more-btn,
@@ -3164,7 +3175,7 @@ body.dynamic-color-active #view-album .track-artist {
   font-size: 13px;
 }
 
-/* Badge Qualità moderno e pulito (Sfondo scuro) */
+/* Modern, clean quality badge (dark background) */
 
 body.dynamic-color-active #view-album .track-quality-badge {
   color: #ffffff !important;
@@ -3175,7 +3186,7 @@ body.dynamic-color-active #view-album .track-quality-badge {
   transition: all 0.2s ease;
 }
 
-/* 8. CONTRASTO MIGLIORATO PER ELEMENTI HERO */
+/* 8. IMPROVED CONTRAST FOR HERO ELEMENTS */
 
 body.dynamic-color-active #view-album .hero-meta,
 body.dynamic-color-active #view-album .hero-type-label,
@@ -3187,10 +3198,10 @@ body.dynamic-color-active #view-album .explicit-badge {
 }
 
 /* ═══════════════════════════════════════════════════════
-   9. MODALITÀ SFONDO CHIARO (TESTI SCURI)
+   9. LIGHT BACKGROUND MODE (DARK TEXT)
 ═══════════════════════════════════════════════════════ */
 
-/* Invertiamo i colori di Titolo, Artista, Durata e Badge */
+/* Invert the colors of Title, Artist, Duration and Badge */
 
 body.dynamic-light-bg #view-album .track-title,
 body.dynamic-light-bg #view-album .track-artist,
@@ -3224,7 +3235,7 @@ body.dynamic-light-bg #view-album .track-artist {
   font-size: 13px;
 }
 
-/* Badge Qualità su sfondo chiaro: niente bordi, solo un nero semi-trasparente pulito */
+/* Quality badge on a light background: no borders, just a clean semi-transparent black */
 
 body.dynamic-light-bg #view-album .track-quality-badge {
   color: #000000 !important;
@@ -3233,13 +3244,13 @@ body.dynamic-light-bg #view-album .track-quality-badge {
   font-weight: 600 !important;
 }
 
-/* Linee di separazione scure su sfondo chiaro */
+/* Dark separator lines on a light background */
 
 body.dynamic-light-bg #view-album .track-row::after {
   background: rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Sfondi Hover e Play scuri quando lo sfondo è chiaro */
+/* Dark Hover and Play backgrounds when the background is light */
 
 body.dynamic-light-bg #view-album .track-row:hover {
   background: rgba(0, 0, 0, 0.075) !important;
@@ -3249,18 +3260,18 @@ body.dynamic-light-bg #view-album .track-row.is-playing {
   background: rgba(0, 0, 0, 0.13) !important;
 }
 
-/* Pallino Play scuro */
+/* Dark Play dot */
 
 body.dynamic-light-bg #view-album .track-row.is-playing .track-mini-art .track-play-icon::after {
-  background: #111111 !important;
+  background: #0f0e14 !important;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Fix per il link dell'Artista in alto (Hero) su sfondi chiari */
+/* Fix for the Artist link at the top (Hero) on light backgrounds */
 
 body.dynamic-light-bg #view-album .hero-artist-link {
-  color: #111111 !important;
-  text-decoration-color: #111111 !important;
+  color: #0f0e14 !important;
+  text-decoration-color: #0f0e14 !important;
 }
 
 body.dynamic-light-bg #view-album .hero-artist-link:hover {
@@ -3268,25 +3279,25 @@ body.dynamic-light-bg #view-album .hero-artist-link:hover {
   text-decoration-color: #000000 !important;
 }
 
-/*Testo full screen sempre bianco*/
+/* Fullscreen text is always white */
 
-/*ARTISTA IMMAGINE*/
+/* ARTIST IMAGE */
 
-/* 1. Nascondi i riflessi dorati (glow/shimmer) se dentro c'è un placeholder */
+/* 1. Hide the accent glows (glow/shimmer) if there is a placeholder inside */
 
 .artist-avatar:has(.artist-avatar-placeholder) .hero-art-glow,
 .card-art:has(.card-placeholder) .card-art-shimmer {
   display: none !important;
 }
 
-/* 2. Diamo la transizione morbida direttamente alle forme esterne (il cerchio e il quadrato) */
+/* 2. Apply the smooth transition directly to the outer shapes (the circle and the square) */
 
 .artist-avatar,
 .card-art {
   transition: transform 0.35s cubic-bezier(.4,0,.2,1);
 }
 
-/* 3. Nelle card, se c'è il placeholder, facciamo ingrandire l'intero riquadro grigio */
+/* 3. In cards, if there is a placeholder, scale up the whole gray box */
 
 .card:hover .card-art:has(.card-placeholder) {
   transform: scale(1.05);
@@ -3294,7 +3305,7 @@ body.dynamic-light-bg #view-album .hero-artist-link:hover {
 
 /* ═══════════════════════════════════════════════════════
    UI POLISH 2026 — desktop music app refinements
-   Non cambia l'HTML: solo override estetici e UX.
+   Does not change the HTML: only aesthetic and UX overrides.
 ═══════════════════════════════════════════════════════ */
 
 html,
@@ -3302,7 +3313,7 @@ body {
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: radial-gradient(circle at 18% 0%, rgba(240,189,97,.08), transparent 28%), radial-gradient(circle at 88% 12%, rgba(79,195,247,.045), transparent 34%), var(--bg);
+  background: radial-gradient(circle at 18% 0%, rgba(157,140,255,.08), transparent 28%), radial-gradient(circle at 88% 12%, rgba(79,195,247,.045), transparent 34%), var(--bg);
 }
 
 *,
@@ -3324,7 +3335,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(240,189,97,.36);
+  background-color: rgba(157,140,255,.36);
 }
 
 button,
@@ -3345,7 +3356,7 @@ button:disabled {
 }
 
 #titlebar {
-  background: linear-gradient(180deg, rgba(14,14,15,.94), rgba(8,8,9,.88));
+  background: linear-gradient(180deg, rgba(13,12,17,.94), rgba(7,7,10,.88));
   border-bottom-color: var(--hairline);
   backdrop-filter: blur(18px) saturate(1.18);
   box-shadow: 0 1px 0 rgba(255,255,255,.035) inset;
@@ -3357,7 +3368,7 @@ button:disabled {
 }
 
 .logo-text {
-  color: #958e84;
+  color: #838198;
   font-weight: 500;
 }
 
@@ -3393,7 +3404,7 @@ button:disabled {
   position: absolute;
   inset: -1px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(240,189,97,.35), rgba(255,255,255,.08), transparent 70%);
+  background: linear-gradient(135deg, rgba(157,140,255,.35), rgba(255,255,255,.08), transparent 70%);
   opacity: 0;
   transition: opacity var(--transition);
   z-index: -1;
@@ -3415,15 +3426,15 @@ button:disabled {
 #playlist-search:focus,
 #settings-api-input:focus {
   background: rgba(255,255,255,.07) !important;
-  border-color: rgba(240,189,97,.42) !important;
+  border-color: rgba(157,140,255,.42) !important;
 }
 
 .search-icon {
-  color: #8d867d;
+  color: #7b7991;
 }
 
 #sidebar {
-  background: linear-gradient(180deg, rgba(12,12,13,.98), rgba(9,9,10,.96));
+  background: linear-gradient(180deg, rgba(11,11,14,.98), rgba(8,8,11,.96));
   border-right-color: var(--hairline);
   box-shadow: 1px 0 0 rgba(255,255,255,.025) inset;
 }
@@ -3433,7 +3444,7 @@ button:disabled {
 }
 
 .sidebar-label {
-  color: #69635d;
+  color: #59576f;
   margin-bottom: 7px;
 }
 
@@ -3452,8 +3463,8 @@ button:disabled {
 
 .nav-item.active {
   color: var(--gold);
-  background: linear-gradient(90deg, rgba(240,189,97,.14), rgba(240,189,97,.045));
-  border-color: rgba(240,189,97,.12);
+  background: linear-gradient(90deg, rgba(157,140,255,.14), rgba(157,140,255,.045));
+  border-color: rgba(157,140,255,.12);
 }
 
 .nav-item.active::before {
@@ -3480,7 +3491,7 @@ button:disabled {
 }
 
 .page-subtitle {
-  color: #9a9389;
+  color: #88879c;
 }
 
 .section-title {
@@ -3525,7 +3536,7 @@ button:disabled {
 .card-play-btn {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, #ffd17b, var(--gold));
+  background: linear-gradient(135deg, #c4baff, var(--gold));
 }
 
 .card-title {
@@ -3534,11 +3545,11 @@ button:disabled {
 }
 
 .card-sub {
-  color: #958e84;
+  color: #838198;
 }
 
 .card-type-badge {
-  background: rgba(8,8,9,.66);
+  background: rgba(7,7,10,.66);
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 8px 18px rgba(0,0,0,.3);
 }
@@ -3559,7 +3570,7 @@ button:disabled {
 }
 
 .track-row.is-playing {
-  background: linear-gradient(90deg, rgba(240,189,97,.16), rgba(240,189,97,.055));
+  background: linear-gradient(90deg, rgba(157,140,255,.16), rgba(157,140,255,.055));
 }
 
 .track-title {
@@ -3568,13 +3579,13 @@ button:disabled {
 }
 
 .track-artist {
-  color: #a59e94;
+  color: #9493a6;
 }
 
 .track-album-name,
 .track-dur,
 .track-num {
-  color: #756f68;
+  color: #63617c;
 }
 
 .track-mini-art {
@@ -3588,7 +3599,7 @@ button:disabled {
   font-weight: 600;
 }
 
-.hero-section,
+/*.hero-section,
 .artist-hero-section,
 .featured-hero {
   border-bottom: 1px solid rgba(255,255,255,.055);
@@ -3601,7 +3612,7 @@ button:disabled {
 
 .hero-overlay {
   background: linear-gradient(to bottom, rgba(7,7,7,.28) 0%, rgba(7,7,7,.74) 58%, var(--bg) 100%), radial-gradient(circle at 18% 24%, rgba(240,189,97,.18), transparent 38%);
-}
+}*/
 
 .hero-art,
 .artist-avatar {
@@ -3615,12 +3626,12 @@ button:disabled {
   text-shadow: 0 16px 52px rgba(0,0,0,.55);
 }
 
-.btn-play-hero,
+
 #play-btn,
 .mini-overlay-play {
-  background: linear-gradient(135deg, #ffe0a1, var(--gold)) !important;
-  color: #090908 !important;
-  box-shadow: 0 14px 36px rgba(240,189,97,.22), 0 1px 0 rgba(255,255,255,.28) inset;
+  background: linear-gradient(135deg, #ddd6ff, var(--gold)) !important;
+  color: #07070a !important;
+  box-shadow: 0 14px 36px rgba(157,140,255,.22), 0 1px 0 rgba(255,255,255,.28) inset;
 }
 
 .btn-shuffle-hero,
@@ -3646,7 +3657,7 @@ button:disabled {
 }
 
 #player-bar {
-  background: linear-gradient(180deg, rgba(18,18,20,.92), rgba(9,9,10,.98));
+  background: linear-gradient(180deg, rgba(16,16,22,.92), rgba(8,8,11,.98));
   border-top-color: var(--hairline-strong);
   box-shadow: 0 -18px 52px rgba(0,0,0,.34), 0 1px 0 rgba(255,255,255,.05) inset;
   backdrop-filter: blur(18px) saturate(1.16);
@@ -3671,11 +3682,11 @@ button:disabled {
 }
 
 #now-artist {
-  color: #a69f95;
+  color: #9594a7;
 }
 
 #now-specs {
-  color: var(--gold);
+  
   opacity: .9;
 }
 
@@ -3705,11 +3716,11 @@ button:disabled {
 
 #seekbar-thumb,
 #vol-thumb {
-  box-shadow: 0 0 0 4px rgba(240,189,97,.14), 0 4px 12px rgba(0,0,0,.5);
+  box-shadow: 0 0 0 4px rgba(157,140,255,.14), 0 4px 12px rgba(0,0,0,.5);
 }
 
 #queue-panel {
-  background: linear-gradient(180deg, rgba(15,15,17,.98), rgba(10,10,11,.98));
+  background: linear-gradient(180deg, rgba(14,13,19,.98), rgba(9,9,12,.98));
   border-left-color: var(--hairline);
   box-shadow: -18px 0 46px rgba(0,0,0,.22);
 }
@@ -3747,7 +3758,7 @@ button:disabled {
 .settings-group-title {
   background: rgba(255,255,255,.025);
   border-bottom-color: var(--hairline);
-  color: #817a72;
+  color: #6f6d86;
 }
 
 .settings-row {
@@ -3755,7 +3766,7 @@ button:disabled {
 }
 
 .settings-row-desc {
-  color: #847d75;
+  color: #727089;
 }
 
 .quality-btn,
@@ -3777,7 +3788,7 @@ button:disabled {
 }
 
 .toggle.active {
-  background: linear-gradient(135deg, var(--gold), #ffd789);
+  background: linear-gradient(135deg, var(--gold), #cbc2ff);
 }
 
 .search-tabs {
@@ -3795,12 +3806,12 @@ button:disabled {
 
 .search-tab.active {
   background: var(--goldfaint);
-  border-color: rgba(240,189,97,.2);
+  border-color: rgba(157,140,255,.2);
   color: var(--gold);
 }
 
 .toast {
-  background: rgba(22,22,25,.88);
+  background: rgba(20,20,27,.88);
   border-color: var(--hairline-strong);
   box-shadow: 0 18px 52px rgba(0,0,0,.48);
 }
@@ -3845,10 +3856,10 @@ button:disabled {
 
 /* ═══════════════════════════════════════════════════════
    EXTRA POLISH — premium desktop music app v2
-   Aggiunte non invasive: nessuna modifica HTML richiesta.
+   Non-invasive additions: no HTML changes required.
 ═══════════════════════════════════════════════════════ */
 
-/* Sfondo vivo, molto sottile: dà profondità anche nelle pagine vuote. */
+/* Subtle living background: adds depth even on empty pages. */
 
 #content::before {
   content: '';
@@ -3856,7 +3867,7 @@ button:disabled {
   inset: var(--titlebar-h) 0 var(--player-h) var(--sidebar-w);
   pointer-events: none;
   z-index: 0;
-  background: radial-gradient(circle at 18% 8%, rgba(212,168,83,.105), transparent 30%), radial-gradient(circle at 88% 20%, rgba(79,195,247,.055), transparent 28%), linear-gradient(180deg, rgba(255,255,255,.018), transparent 28%);
+  background: radial-gradient(circle at 18% 8%, rgba(123,106,240,.105), transparent 30%), radial-gradient(circle at 88% 20%, rgba(79,195,247,.055), transparent 28%), linear-gradient(180deg, rgba(255,255,255,.018), transparent 28%);
   opacity: .72;
 }
 
@@ -3869,7 +3880,7 @@ button:disabled {
   z-index: 1;
 }
 
-/* Titlebar più “native app”, con separazione luminosa appena percettibile. */
+/* Titlebar more "native app"-like, with a barely perceptible light separation. */
 
 #titlebar::after {
   content: '';
@@ -3878,13 +3889,13 @@ button:disabled {
   right: 0;
   bottom: -1px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212,168,83,.22), transparent);
+  background: linear-gradient(90deg, transparent, rgba(123,106,240,.22), transparent);
   opacity: .5;
   pointer-events: none;
 }
 
 .logo-mark {
-  text-shadow: 0 0 20px rgba(212,168,83,.42);
+  text-shadow: 0 0 20px rgba(123,106,240,.42);
 }
 
 .titlebar-btn,
@@ -3909,9 +3920,9 @@ button,
   transform: scale(var(--press-scale));
 }
 
-/* Focus visibile ma elegante per tastiera/accessibilità. */
+/* Visible but elegant focus for keyboard/accessibility. */
 
-/* Search più premium: glow interno e bottone chiusura coerente. */
+/* More premium search: inner glow and a consistent close button. */
 
 .search-wrap::after {
   content: '';
@@ -3919,7 +3930,7 @@ button,
   inset: -1px;
   border-radius: 999px;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(212,168,83,.16), transparent);
+  background: linear-gradient(90deg, transparent, rgba(123,106,240,.16), transparent);
   opacity: 0;
   transition: opacity var(--transition);
 }
@@ -3944,7 +3955,7 @@ button,
   transform: scale(1.06);
 }
 
-/* Sidebar: indicatore attivo e sezioni più leggibili. */
+/* Sidebar: active indicator and more readable sections. */
 
 .sidebar-section {
   position: relative;
@@ -3977,14 +3988,14 @@ button,
 }
 
 .nav-item.active {
-  box-shadow: inset 0 0 0 1px rgba(212,168,83,.08), var(--glow-gold);
+  box-shadow: inset 0 0 0 1px rgba(123,106,240,.08), var(--glow-gold);
 }
 
 .playlist-dot {
-  box-shadow: 0 0 14px rgba(212,168,83,.36);
+  box-shadow: 0 0 14px rgba(123,106,240,.36);
 }
 
-/* Card: shine diagonale e bordo dinamico al passaggio. */
+/* Card: diagonal shine and dynamic border on hover. */
 
 .card-art::before {
   content: '';
@@ -3995,7 +4006,6 @@ button,
   background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.16) 45%, transparent 68%);
   transform: translateX(-120%);
 
-  /*transition: transform .72s cubic-bezier(.2,.8,.2,1);*/
   mix-blend-mode: screen;
 }
 
@@ -4025,7 +4035,7 @@ button,
   box-shadow: 0 12px 30px rgba(0,0,0,.62), 0 0 0 1px rgba(255,255,255,.14);
 }
 
-/* Tracklist: riga più leggibile, bordino e onda per il brano attivo. */
+/* Tracklist: more readable rows, border and wave for the active track. */
 
 .track-row {
   border: 1px solid transparent;
@@ -4037,7 +4047,7 @@ button,
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(212,168,83,.10), transparent 46%);
+  background: linear-gradient(90deg, rgba(123,106,240,.10), transparent 46%);
   opacity: 0;
   transition: opacity var(--transition);
 }
@@ -4052,8 +4062,8 @@ button,
 }
 
 .track-row.is-playing {
-  border-color: rgba(212,168,83,.16);
-  box-shadow: inset 0 0 0 1px rgba(212,168,83,.06);
+  border-color: rgba(123,106,240,.16);
+  box-shadow: inset 0 0 0 1px rgba(123,106,240,.06);
 }
 
 .track-artist:hover,
@@ -4070,7 +4080,7 @@ button,
   background: rgba(255,255,255,.07);
 }
 
-/* Mini copertine più rifinite. */
+/* More refined mini covers. */
 
 .track-mini-art,
 .queue-art,
@@ -4084,16 +4094,16 @@ button,
   transform: translateZ(0);
 }
 
-/* Hero: profondità e CTA più da prodotto premium. */
+/* Hero: depth and a more premium-product CTA. */
 
-.hero-section::after,
+
 .artist-hero-section::after,
 .featured-hero::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(255,255,255,.055), transparent 18%), radial-gradient(circle at 24% 100%, rgba(212,168,83,.12), transparent 36%);
+  background: linear-gradient(180deg, rgba(255,255,255,.055), transparent 18%), radial-gradient(circle at 24% 100%, rgba(123,106,240,.12), transparent 36%);
   opacity: .65;
   z-index: 1;
 }
@@ -4104,9 +4114,9 @@ button,
   z-index: 3;
 }
 
-.hero-art,
+
 .artist-avatar {
-  box-shadow: 0 28px 76px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.09), 0 0 60px rgba(212,168,83,.08);
+  box-shadow: 0 28px 76px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.09), 0 0 60px rgba(123,106,240,.08);
 }
 
 .btn-play-hero,
@@ -4116,10 +4126,10 @@ button,
 
 .btn-play-hero:hover,
 #play-btn:hover {
-  box-shadow: 0 18px 44px rgba(212,168,83,.28), 0 0 0 1px rgba(255,255,255,.16);
+  box-shadow: 0 18px 44px rgba(123,106,240,.28), 0 0 0 1px rgba(255,255,255,.16);
 }
 
-/* Player bar: più separazione, controlli sospesi e stato qualità più leggibile. */
+/* Player bar: more separation, floating controls and a more readable quality state. */
 
 #player-bar::before {
   content: '';
@@ -4128,7 +4138,7 @@ button,
   right: 0;
   top: -1px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), rgba(212,168,83,.2), rgba(255,255,255,.14), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), rgba(123,106,240,.2), rgba(255,255,255,.14), transparent);
   pointer-events: none;
 }
 
@@ -4183,7 +4193,7 @@ button,
   transform: rotate(45deg);
 }
 
-/* Queue: evidenziazione morbida e layout più compatto. */
+/* Queue: soft highlighting and a more compact layout. */
 
 #queue-panel.open {
   box-shadow: -26px 0 58px rgba(0,0,0,.28);
@@ -4200,7 +4210,7 @@ button,
 .queue-item.playing,
 .queue-item.is-playing {
   background: var(--goldfaint);
-  border-color: rgba(212,168,83,.14);
+  border-color: rgba(123,106,240,.14);
 }
 
 .queue-close {
@@ -4211,7 +4221,7 @@ button,
   background: rgba(255,255,255,.07);
 }
 
-/* Settings: righe più “card”, toggle e pulsanti qualità più chiari. */
+/* Settings: more "card"-like rows, clearer toggles and quality buttons. */
 
 .settings-group {
   position: relative;
@@ -4261,7 +4271,7 @@ button,
   opacity: 1;
 }
 
-/* Search results/tabs: effetto pill più moderno. */
+/* Search results/tabs: more modern pill effect. */
 
 .search-tabs {
   padding: 4px;
@@ -4279,7 +4289,7 @@ button,
   box-shadow: var(--glow-gold);
 }
 
-/* Empty/loading states più curati. */
+/* More polished empty/loading states. */
 
 .empty-state {
   border: 1px dashed rgba(255,255,255,.09);
@@ -4291,7 +4301,7 @@ button,
   background-image: linear-gradient(90deg, var(--bg2) 20%, rgba(255,255,255,.075) 48%, var(--bg2) 76%);
 }
 
-/* Toast/modal più rifiniti. */
+/* More refined toast/modal. */
 
 .toast.show {
   animation: toastPop .28s cubic-bezier(.34,1.56,.64,1);
@@ -4314,9 +4324,9 @@ button,
   background: rgba(255,255,255,.07);
 }
 
-/* Fullscreen: look più immersivo, cover più cinematografica. */
+/* Fullscreen: more immersive look, more cinematic cover. */
 
-/* Finestra desktop: controlli più integrati. */
+/* Desktop window: better integrated controls. */
 
 .win-controls {
   margin-left: 8px;
@@ -4338,23 +4348,23 @@ button,
   color: #fff !important;
 }
 
-/* Sfondo copertina blurrata per la pagina Lyrics */
+/* Blurred cover background for the Lyrics page */
 
 #view-lyrics {
   position: relative;
   overflow: hidden;
 
-  /* Evita che il blur sbordi creando scroll orizzontali */
+  /* Prevents the blur from overflowing and creating horizontal scroll */
 }
 
 #view-lyrics::before {
   content: '';
   position: fixed;
 
-  /* Lo tiene fermo anche se scorri il testo */
+  /* Keeps it fixed even when the text scrolls */
   inset: 0;
 
-  /* Margine negativo per nascondere i bordi non sfocati */
+  /* Negative margin to hide the unblurred edges */
   transform: scale(1.08);
   background-image: var(--lyrics-bg, none);
   background-size: cover;
@@ -4369,7 +4379,7 @@ button,
   position: relative;
   z-index: 1;
 
-  /* Assicura che il testo rimanga sopra lo sfondo */
+  /* Makes sure the text stays above the background */
 }
 
 .time-label.end {
@@ -4377,7 +4387,7 @@ button,
 }
 
 /* ═══════════════════════════════════════════════════════
-   PLAYER BAR — LIQUID GLASS (flottante, non attivo in mini mode)
+   PLAYER BAR — LIQUID GLASS (floating, not active in mini mode)
 ═══════════════════════════════════════════════════════ */
 
 #shell:not(.mini-mode) {
@@ -4394,7 +4404,7 @@ button,
   border-radius: 30px;
   background:
     linear-gradient(135deg, rgba(255,255,255,.11) 0%, rgba(255,255,255,.03) 42%, rgba(255,255,255,.06) 100%),
-    rgba(12,12,14,.52);
+    rgba(11,11,15,.52);
   -webkit-backdrop-filter: blur(30px) saturate(1.9) brightness(1.06);
   backdrop-filter: blur(30px) saturate(1.9) brightness(1.06);
   box-shadow:
@@ -4410,20 +4420,20 @@ button,
 #shell:not(.mini-mode) #player-bar:hover {
   background:
     linear-gradient(135deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.04) 42%, rgba(255,255,255,.075) 100%),
-    rgba(12,12,14,.50);
+    rgba(11,11,15,.50);
 }
 
-/* riflesso speculare sul bordo alto (stessi bianco/oro di prima) */
+/* specular reflection on the top edge (same white/accent as before) */
 #shell:not(.mini-mode) #player-bar::before {
   top: 0;
   left: 26px;
   right: 26px;
   height: 1px;
   z-index: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), rgba(240,189,97,.38) 50%, rgba(255,255,255,.55), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), rgba(157,140,255,.38) 50%, rgba(255,255,255,.55), transparent);
 }
 
-/* luce liquida: chiaro in alto a sinistra, alone oro in basso a destra */
+/* liquid light: bright at the top left, accent glow at the bottom right */
 #shell:not(.mini-mode) #player-bar::after {
   content: '';
   position: absolute;
@@ -4433,7 +4443,7 @@ button,
   z-index: 0;
   background:
     radial-gradient(120% 150% at 6% -35%, rgba(255,255,255,.17), transparent 46%),
-    radial-gradient(80% 130% at 102% 135%, rgba(240,189,97,.09), transparent 58%);
+    radial-gradient(80% 130% at 102% 135%, rgba(157,140,255,.09), transparent 58%);
 }
 
 #shell:not(.mini-mode) #player-bar .player-inner {
@@ -4445,7 +4455,7 @@ button,
   border-radius: 5px;
 }
 
-/* il contenuto scorre SOTTO il vetro: spazio per non coprire l'ultima riga */
+/* content scrolls UNDER the glass: leave room so the last row is not covered */
 #shell:not(.mini-mode) #content > .view {
   box-sizing: border-box;
   padding-bottom: calc(var(--player-h) + 28px);
@@ -4467,14 +4477,14 @@ button,
   bottom: calc(var(--player-h) + 20px);
 }
 
-/* ── Leggibilità: i controlli non si mimetizzano su schermate scure ───────── */
-/* :where() tiene la specificità bassa: .active, .liked e :hover continuano a vincere */
+/* ── Readability: controls do not blend in on dark screens ────────────────── */
+/* :where() keeps specificity low: .active, .liked and :hover still win */
 
 :where(#shell:not(.mini-mode) #player-bar) .ctrl-btn,
 :where(#shell:not(.mini-mode) #player-bar) .fs-ctrl-btn,
 :where(#shell:not(.mini-mode) #player-bar) .now-action-btn,
 :where(#shell:not(.mini-mode) #player-bar) .vol-btn {
-  color: rgba(247,241,232,.84);
+  color: rgba(244,244,251,.84);
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.55));
 }
 
@@ -4492,12 +4502,12 @@ button,
 }
 
 :where(#shell:not(.mini-mode) #player-bar) .time-label {
-  color: rgba(247,241,232,.72);
+  color: rgba(244,244,251,.72);
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
 }
 
 #shell:not(.mini-mode) #now-artist {
-  color: rgba(247,241,232,.76);
+  color: rgba(244,244,251,.76);
 }
 
 #shell:not(.mini-mode) #now-specs {
@@ -4512,18 +4522,18 @@ button,
 }
 
 /* ═══════════════════════════════════════════════════════
-   FULLSCREEN PLAYER — layout a due colonne + pannello liquid glass
-   (gli ID/classi dell'HTML e del JS non cambiano)
+   FULLSCREEN PLAYER — two-column layout + liquid glass panel
+   (HTML and JS IDs/classes do not change)
 ═══════════════════════════════════════════════════════ */
 
-/* ── Overlay e sfondo ─────────────────────────────────── */
+/* ── Overlay and background ───────────────────────────── */
 
 #fullscreen-overlay {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: #040404;
+  background: #030305;
   overflow: hidden;
 }
 
@@ -4538,17 +4548,17 @@ button,
 }
 
 body.dynamic-color-active #fullscreen-overlay {
-  background: radial-gradient(ellipse at 20% 0%, rgba(var(--dyn-r), var(--dyn-g), var(--dyn-b), .40) 0%, rgba(5,5,7,.96) 60%, var(--bg) 100%), #040404;
+  background: radial-gradient(ellipse at 20% 0%, rgba(var(--dyn-r), var(--dyn-g), var(--dyn-b), .40) 0%, rgba(5,5,7,.96) 60%, var(--bg) 100%), #030305;
 }
 
-/* la copertina sfocata dà il colore all'ambiente */
+/* the blurred cover gives the ambient its color */
 #fs-bg {
   position: absolute;
   inset: -8%;
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(80px) saturate(1.5) brightness(.34);
+  filter: blur(9px) saturate(1.5) brightness(.34);
   transform: scale(1.1);
   animation: fsDrift 38s ease-in-out infinite alternate;
 }
@@ -4558,7 +4568,7 @@ body.dynamic-color-active #fullscreen-overlay {
   to   { transform: scale(1.22) translate3d(-1.5%, 1%, 0); }
 }
 
-/* velo per la leggibilità + luce calda in alto a sinistra */
+/* veil for readability + accent light at the top left */
 #fullscreen-overlay::before {
   content: '';
   position: absolute;
@@ -4566,7 +4576,7 @@ body.dynamic-color-active #fullscreen-overlay {
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(70% 60% at 22% 18%, rgba(240,189,97,.10), transparent 62%),
+    radial-gradient(70% 60% at 22% 18%, rgba(157,140,255,.10), transparent 62%),
     linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.42));
 }
 
@@ -4590,6 +4600,7 @@ body.dynamic-color-active #fullscreen-overlay {
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   transition: background .2s, color .2s, transform .2s, border-color .2s;
+  -webkit-app-region: no-drag;
 }
 
 .fs-close:hover {
@@ -4599,7 +4610,7 @@ body.dynamic-color-active #fullscreen-overlay {
   transform: scale(1.08);
 }
 
-/* ── Griglia principale ───────────────────────────────── */
+/* ── Main grid ────────────────────────────────────────── */
 
 #fs-content-wrap {
   position: relative;
@@ -4623,7 +4634,7 @@ body.dynamic-color-active #fullscreen-overlay {
 
 #fs-content-wrap::-webkit-scrollbar { display: none; }
 
-/* ── Copertina ────────────────────────────────────────── */
+/* ── Cover ────────────────────────────────────────────── */
 
 #fs-art {
   grid-area: art;
@@ -4634,10 +4645,6 @@ body.dynamic-color-active #fullscreen-overlay {
   border-radius: 22px;
   overflow: hidden;
   background: var(--bg2);
-  box-shadow:
-    0 40px 100px rgba(var(--dyn-r, 212), var(--dyn-g, 168), var(--dyn-b, 83), .26),
-    0 30px 70px rgba(0,0,0,.70),
-    0 0 0 1px rgba(255,255,255,.09);
   transition: width .35s cubic-bezier(.4,0,.2,1), box-shadow .4s ease;
 }
 
@@ -4668,7 +4675,7 @@ body.dynamic-color-active #fullscreen-overlay {
   background: var(--bg2);
 }
 
-/* ── Colonna info + controlli ─────────────────────────── */
+/* ── Info + controls column ───────────────────────────── */
 
 .fs-player-ui {
   grid-area: ui;
@@ -4691,7 +4698,6 @@ body.dynamic-color-active #fullscreen-overlay {
 
 .fs-title-wrap {
   width: 100%;
-  overflow: hidden;
   margin: 0 0 8px;
   padding: 0;
 }
@@ -4734,7 +4740,7 @@ body.dynamic-color-active #fullscreen-overlay {
 #fs-artist {
   font-size: 19px;
   font-weight: 600;
-  color: rgba(247,241,232,.92);
+  color: rgba(244,244,251,.92);
 }
 
 #fs-album {
@@ -4787,18 +4793,15 @@ body.dynamic-color-active #fullscreen-overlay {
   backdrop-filter: blur(14px);
 }
 
+#fs-quality-label,
 #fs-specs {
   border: 1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.05);
-  color: rgba(247,241,232,.78);
+  color: rgba(244,244,251,.78);
+  font-weight: bold;
 }
 
-#fs-quality-label {
-  border: 1px solid transparent;
-  font-weight: 600;
-}
-
-/* ── Pannello controlli (liquid glass, stessa ricetta del player) ── */
+/* ── Controls panel (liquid glass, same recipe as the player) ────── */
 
 .fs-bottom-section {
   position: relative;
@@ -4813,7 +4816,7 @@ body.dynamic-color-active #fullscreen-overlay {
   border-radius: 32px;
   background:
     linear-gradient(135deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.03) 45%, rgba(255,255,255,.055) 100%),
-    rgba(12,12,14,.46);
+    rgba(11,11,15,.46);
   -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(1.05);
   backdrop-filter: blur(28px) saturate(1.8) brightness(1.05);
   box-shadow:
@@ -4831,10 +4834,10 @@ body.dynamic-color-active #fullscreen-overlay {
   right: 28px;
   height: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), rgba(240,189,97,.34) 50%, rgba(255,255,255,.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), rgba(157,140,255,.34) 50%, rgba(255,255,255,.5), transparent);
 }
 
-/* i controlli diventano elementi diretti della griglia del pannello */
+/* the controls become direct children of the panel grid */
 .fs-controls {
   display: contents;
 }
@@ -4843,7 +4846,7 @@ body.dynamic-color-active #fullscreen-overlay {
   display: none;
 }
 
-/* riga 1: barra di avanzamento */
+/* row 1: progress bar */
 .fs-seek-area {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -4894,8 +4897,8 @@ body.dynamic-color-active #fullscreen-overlay {
   height: 16px;
   border-radius: 50%;
   background: var(--gold);
-  border: 3px solid #111;
-  box-shadow: 0 0 0 4px rgba(240,189,97,.14), 0 4px 12px rgba(0,0,0,.5);
+  border: 3px solid #0f0e14;
+  box-shadow: 0 0 0 4px rgba(157,140,255,.14), 0 4px 12px rgba(0,0,0,.5);
   transform: translate(-50%, -50%) scale(0);
   transition: transform .2s cubic-bezier(.34,1.56,.64,1);
   pointer-events: none;
@@ -4913,11 +4916,11 @@ body.dynamic-color-active #fullscreen-overlay {
 .fs-time {
   font-size: 11.5px;
   font-weight: 500;
-  color: rgba(247,241,232,.72);
+  color: rgba(244,244,251,.72);
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
 }
 
-/* riga 2: trasporto (shuffle · prev · PLAY · next · repeat) */
+/* row 2: transport (shuffle · prev · PLAY · next · repeat) */
 #fs-content-wrap .fs-ctrl-btn {
   position: relative;
   grid-row: 2;
@@ -4930,7 +4933,7 @@ body.dynamic-color-active #fullscreen-overlay {
   border: none;
   border-radius: 50%;
   background: none;
-  color: rgba(247,241,232,.86);
+  color: rgba(244,244,251,.86);
   font-size: 20px;
   cursor: pointer;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));
@@ -4938,7 +4941,7 @@ body.dynamic-color-active #fullscreen-overlay {
 }
 
 #fs-content-wrap .fs-ctrl-btn:hover {
-  color: var(--gold);
+ 
   background: rgba(255,255,255,.09);
   transform: scale(1.08);
 }
@@ -4947,9 +4950,7 @@ body.dynamic-color-active #fullscreen-overlay {
   transform: scale(.94);
 }
 
-#fs-content-wrap .fs-ctrl-btn.active {
-  color: var(--gold);
-}
+
 
 #fs-content-wrap #fs-repeat-btn.active::after {
   content: '';
@@ -4961,7 +4962,7 @@ body.dynamic-color-active #fullscreen-overlay {
   margin-left: -2px;
   border-radius: 50%;
   background: var(--gold);
-  box-shadow: 0 0 8px rgba(240,189,97,.8);
+  box-shadow: 0 0 8px rgba(157,140,255,.8);
 }
 
 #fs-play-btn {
@@ -4978,16 +4979,16 @@ body.dynamic-color-active #fullscreen-overlay {
   background-color: var(--gold);
   background-image:
     linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0)),
-    linear-gradient(135deg, #ffe0a1, var(--gold));
-  color: #090908;
-  box-shadow: 0 14px 36px rgba(240,189,97,.26), 0 1px 0 rgba(255,255,255,.3) inset;
+    linear-gradient(135deg, #ddd6ff, var(--gold));
+  color: #07070a;
+  box-shadow: 0 14px 36px rgba(157,140,255,.26), 0 1px 0 rgba(255,255,255,.3) inset;
   cursor: pointer;
   transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
 }
 
 #fs-play-btn:hover {
   transform: scale(1.07);
-  box-shadow: 0 18px 44px rgba(240,189,97,.34), 0 0 0 1px rgba(255,255,255,.18);
+  box-shadow: 0 18px 44px rgba(157,140,255,.34), 0 0 0 1px rgba(255,255,255,.18);
 }
 
 #fs-play-btn:active { transform: scale(.95); }
@@ -5015,7 +5016,7 @@ body.dynamic-color-active #fullscreen-overlay {
   animation: spin .8s linear infinite;
 }
 
-/* riga 3: volume a sinistra, testi e menu a destra */
+/* row 3: volume on the left, lyrics and menu on the right */
 .fs-vol-area {
   grid-column: 1 / 4;
   grid-row: 3;
@@ -5033,7 +5034,7 @@ body.dynamic-color-active #fullscreen-overlay {
   padding: 6px;
   border: none;
   background: none;
-  color: rgba(247,241,232,.78);
+  color: rgba(244,244,251,.78);
   cursor: pointer;
   transition: color .2s;
 }
@@ -5080,7 +5081,7 @@ body.dynamic-color-active #fullscreen-overlay {
   height: 14px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(240,189,97,.14), 0 2px 6px rgba(0,0,0,.5);
+  box-shadow: 0 0 0 4px rgba(157,140,255,.14), 0 2px 6px rgba(0,0,0,.5);
   transform: translate(-50%, -50%) scale(0);
   transition: transform .2s cubic-bezier(.34,1.56,.64,1);
   pointer-events: none;
@@ -5104,7 +5105,7 @@ body.dynamic-color-active #fullscreen-overlay {
   height: 40px;
 }
 
-/* ── Modalità testi: cover piccola a sinistra, testo grande a destra ── */
+/* ── Lyrics mode: small cover on the left, large text on the right ──── */
 
 #fs-content-wrap.show-lyrics {
   grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
@@ -5196,7 +5197,7 @@ body.dynamic-color-active #fullscreen-overlay {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Finestre strette: una sola colonna ───────────────── */
+/* ── Narrow windows: single column ────────────────────── */
 
 @media (max-width: 860px) {
   #fs-content-wrap {
@@ -5251,13 +5252,13 @@ body.dynamic-color-active #fullscreen-overlay {
 }
 
 
-/* allinea i pulsanti del trasporto al play (stesso spostamento) */
+/* aligns the transport buttons with play (same offset) */
 .ctrl-btns .ctrl-btn {
   position: relative;
   bottom: var(--ctrl-shift);
 }
 
-/* ── Finestre basse ───────────────────────────────────── */
+/* ── Short windows ────────────────────────────────────── */
 
 @media (max-height: 620px) {
   #fs-content-wrap { padding-top: 48px; padding-bottom: 20px; }
@@ -5268,20 +5269,20 @@ body.dynamic-color-active #fullscreen-overlay {
 }
 
 #repeat-btn {
-  font-size: 17px; /* Stessa dimensione del font usata nel Fullscreen */
+  font-size: 17px; /* Same font size used in Fullscreen */
 }
 
 #repeat-btn.active::after {
   content: '';
   position: absolute;
-  bottom: 2px; /* Regola la distanza del pallino dal fondo */
+  bottom: 2px; /* Adjusts the distance of the dot from the bottom */
   left: 50%;
   width: 4px;
   height: 4px;
   margin-left: -2px;
   border-radius: 50%;
   background: var(--gold);
-  box-shadow: 0 0 8px rgba(240, 189, 97, 0.8);
+  box-shadow: 0 0 8px rgba(157, 140, 255, 0.8);
 }
 
 #fs-repeat-btn{
@@ -5293,7 +5294,7 @@ body.dynamic-color-active #fullscreen-overlay {
 }
 
 
-/*Login*/
+/* Login */
 #login-overlay {
   position: fixed; inset: 0; z-index: 9999;
   background: var(--bg); display: flex; align-items: center; justify-content: center;
@@ -5313,8 +5314,8 @@ body.dynamic-color-active #fullscreen-overlay {
 
 
 /* Karaoke Word-by-Word
-   Gli stili agiscono SOLO dentro la riga attiva: le righe passate/future
-   restano con lo stile normale anche se le loro parole hanno ancora .active */
+   Styles apply ONLY inside the active line: past/future lines
+   keep the normal style even if their words still have .active */
 .lyric-word {
   display: inline;
   white-space: pre-wrap;
@@ -5322,20 +5323,20 @@ body.dynamic-color-active #fullscreen-overlay {
 }
 
 .lyric-line.active .lyric-word {
-  opacity: 0.35;            /* parola non ancora cantata */
+  opacity: 0.35;            /* word not yet sung */
 }
 
 .lyric-line.active .lyric-word.active {
-  opacity: 1;               /* parola cantata */
-  text-shadow: 0 0 22px rgba(212, 168, 83, 0.55);
+  opacity: 1;               /* sung word */
+  text-shadow: 0 0 22px rgba(123, 106, 240, 0.55);
 }
 
-/* il glow lo danno le singole parole, non l'intera riga */
+/* the glow comes from the individual words, not the whole line */
 .lyric-line.active:has(.lyric-word) {
   text-shadow: none;
 }
 
-/* testi non sincronizzati: nessun effetto click/hover */
+/* unsynced lyrics: no click/hover effect */
 .lyric-line.no-sync {
   cursor: default;
   color: rgba(255, 255, 255, 0.75);

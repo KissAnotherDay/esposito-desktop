@@ -67,13 +67,13 @@ export function albumCard(album, onClick, onPlay) {
   const type = (album.album_type || 'album').toLowerCase();
   const typeLabel = type === 'ep' ? 'EP' : type === 'single' ? 'Single' : '';
 
-  // LOGICA BADGE HI-RES MIGLIORATA
+  // Hi-Res badge logic
   const depth = parseInt(album.maximum_bit_depth || album.bit_depth || 16, 10);
   const sr = parseFloat(album.maximum_sampling_rate || album.sampling_rate || 44.1);
   const isHiRes = album.hires || album.hires_streamable || (album.audioQuality?.includes('HI_RES')) || (depth >= 24 && sr >= 44.1);
   
-  // FIX: Aggiunti "width: auto !important", "max-width: none" e "object-fit: contain" 
-  // per impedire che il CSS generale stiri la foto su tutta la card!
+  // Force "width: auto !important", "max-width: none" and "object-fit: contain"
+  // so the global CSS does not stretch the badge image across the whole card
   const hiResBadge = isHiRes ? `<img src="hi_res_bdge.jpg" alt="Hi-Res" style="position: absolute; top: 8px; left: 8px; height: 32px; width: auto !important; max-width: none !important; object-fit: contain !important; border-radius: 0 !important; z-index: 10; pointer-events: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));">` : '';
 
   return `
@@ -118,7 +118,7 @@ export function trackRow(track, idx, options = {}) {
   const albumTitle = showAlbum ? (track.album?.title || '') : '';
   const img = showCover ? coverUrl(track.album?.image?.large || track.album?.cover) : null;
   
-  // ── LOGICA QUALITÀ BRANO E BADGE HI-RES ──
+  // ── TRACK QUALITY & HI-RES BADGE LOGIC ───
   let ql = 'LOSSLESS';
   let qualityClass = 'lossless';
   
@@ -129,24 +129,20 @@ export function trackRow(track, idx, options = {}) {
     ql = 'MP3'; 
     qualityClass = 'lossless';
   } else if (depth >= 24) {
-    // 24-bit: controllo sulla frequenza di campionamento
-    if (sr > 48.0) { 
+    // 24-bit: check the sampling rate
+    if (sr >=44.1 || sr> 48.0) { 
       ql = 'HI-RES'; 
       qualityClass = 'hires'; 
-    } else { 
-      // 44.1 o 48.0 a 24 bit
-      ql = '24BIT'; 
-      qualityClass = 'bit24'; 
-    }
+    } 
   } else {
     // 16-bit
     ql = 'LOSSLESS'; 
     qualityClass = 'lossless';
   }
 
-  // Creazione badge immagine se le specs sono da Hi-Res
+  // Create the image badge if the specs are Hi-Res
   const isHiResTrack = parseInt(depth, 10) >= 24 && parseFloat(sr) >= 44.1;
-  const hiResBadge = ''; //badge hi_res sulle tracce
+  const hiResBadge = ''; // Hi-Res badge for track rows (currently disabled)
 
   const explicitBadge = track.explicit ? '<span class="explicit-badge">E</span>' : '';
 
@@ -204,14 +200,14 @@ export function albumHero(album, tracks) {
   
   const labelName = album.label?.name || album.copyright || '';
 
-  // BADGE HI-RES PER TITOLO HERO (PIÙ GRANDE: 32px)
+  // Hi-Res badge for the hero title (larger: 32px)
   const depth = parseInt(album.maximum_bit_depth || album.bit_depth || (album.audioQuality?.includes('HI_RES') ? 24 : 16), 10);
   const sr = parseFloat(album.maximum_sampling_rate || album.sampling_rate || 44.1);
   const isHiRes = depth >= 24 && sr >= 44.1;
   const hiResBadge = isHiRes ? `<img src="hi_res_bdge.jpg" alt="Hi-Res" title="Hi-Res Audio" style="height: 32px; margin-left: 12px; vertical-align: middle; transform: translateY(-4px);">` : '';
 
   return `
-    <div class="hero-section" style="--hero-img:url('${img || ''}')">
+    <div class="hero-section">
       <div class="hero-bg"></div>
       <div class="hero-overlay"></div>
       <div class="hero-content">
@@ -222,7 +218,6 @@ export function albumHero(album, tracks) {
         <div class="hero-info">
           <!--div class="hero-type-label">${type}</div-->
           
-          <!-- QUI È STATO INSERITO IL BADGE ACCANTO AL TITOLO -->
           <h1 class="hero-title">${escHtml(album.title || '')}${album.version ? ` (${escHtml(album.version)})` : ''}${hiResBadge}</h1>
           
           <div class="hero-meta">
@@ -490,9 +485,9 @@ export function initSeekbar(player) {
   }
 }
 
-// ── VOLUME SLIDER (Doppio supporto: Player standard e Fullscreen) ────────────
+// ── VOLUME SLIDER (standard player + fullscreen) ─────────────────────────────
 export function initVolume(player) {
-  // Aggiunti gli ID della versione Fullscreen agli array
+  // Include the fullscreen controls' IDs in the arrays
   const tracks = [document.getElementById('vol-track'), document.getElementById('fs-vol-track')];
   const fills = [document.getElementById('vol-fill'), document.getElementById('fs-vol-fill')];
   const thumbs = [document.getElementById('vol-thumb'), document.getElementById('fs-vol-thumb')];
@@ -535,7 +530,7 @@ export function initVolume(player) {
   player.on('volumechange', v => update(v));
   player.on('mutechange', () => update(player.volume));
   
-  // Imposta il volume iniziale per entrambe le barre
+  // Set the initial volume on both sliders
   update(player.volume);
 }
 
@@ -547,20 +542,20 @@ export function checkMarquee() {
     
     const parent = el.parentElement;
     
-    // Se il testo è più largo del suo contenitore, attiva lo scorrimento
+    // If the text is wider than its container, enable scrolling
     if (el.scrollWidth > parent.clientWidth) {
-      // Calcola l'esatta distanza da percorrere (larghezza testo - larghezza contenitore + margine extra)
+      // Compute the exact distance to scroll (text width - container width + extra margin)
       const offset = parent.clientWidth - el.scrollWidth - 30;
       el.style.setProperty('--marquee-offset', `${offset}px`);
       el.classList.add('marquee');
     } else {
-      // Se entra tutto, rimuovi l'animazione e rimettilo al centro/sinistra
+      // If everything fits, remove the animation and reset the position
       el.classList.remove('marquee');
       el.style.removeProperty('--marquee-offset');
     }
   };
 
-  // Esegui il controllo per entrambi i player
+  // Run the check for both players
   processMarquee('now-title');
   processMarquee('fs-title');
 }

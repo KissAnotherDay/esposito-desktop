@@ -1,6 +1,6 @@
 {
   "name": "esposito-hifi",
-  "version": "6.3.1",
+  "version": "6.3.3",
   "description": "Esposito HI-FI — Desktop Music Player",
   "main": "main.js",
   "scripts": {

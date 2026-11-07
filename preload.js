@@ -9,38 +9,39 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMaximizeChange: (cb)  => ipcRenderer.on('win-maximized-changed', (_e, val) => cb(val)),
   resizeWindow:   (w, h)  => ipcRenderer.send('win-resize', w, h),
   
-  // NUOVI PONTI: getBounds e centerWindow
+  // New bridges: getBounds and centerWindow
   getBounds:      ()      => ipcRenderer.invoke('get-bounds'),
   centerWindow:   ()      => ipcRenderer.invoke('center-window'),
 
-  //CACHE
+  // Cache
   getCacheSize: () => ipcRenderer.invoke('get-cache-size'),
   clearHttpCache:  () => ipcRenderer.invoke('clear-http-cache'),
   
   platform: process.platform,
   
   
-  //DiscordRPC
+  // Discord RPC
   updateDiscordRPC: (data) => ipcRenderer.send('update-discord-rpc', data),
   clearDiscordRPC:  ()     => ipcRenderer.send('clear-discord-rpc'),
   setDiscordRPC:    (v)    => ipcRenderer.send('set-discord-rpc', v),
 
 
-  //miniplayer
+  // Mini player
   toggleMiniWindow: () => ipcRenderer.send('toggle-mini-window'),
   
-  // Metodi per la Finestra Principale
+  // Main window methods
   syncToMini: (data) => ipcRenderer.send('sync-to-mini', data),
   onMiniAction: (callback) => ipcRenderer.on('execute-mini-action', (_event, action, payload) => callback(action, payload)),
   
-  // Metodi per la Finestra del Mini Player
+  // Mini player window methods
   sendMiniAction: (action, payload) => ipcRenderer.send('action-from-mini', action, payload),
   onUpdateMiniUI: (callback) => ipcRenderer.on('update-mini-ui', (_event, data) => callback(data)),
+  onMiniHover: (callback) => ipcRenderer.on('mini-hover', (_event, inside) => callback(inside)),
 
-  //MD5 FOR STREAM
+  // MD5 for stream signing
   getMD5: (text) => ipcRenderer.invoke('generate-md5', text),
 
-  //Apple Token
+  // Apple token
   getAppleToken: () => ipcRenderer.invoke('get-apple-token'),
   appleApiFetch: (url, token) => ipcRenderer.invoke('apple-api-fetch', url, token),
     

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, session, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, session, Menu, screen } = require('electron');
 const path = require('path');
 
 app.setAppUserModelId("com.esposito.hifi");
@@ -266,8 +266,25 @@ function createMiniWindow() {
 
   // Caricheremo un file HTML separato per il mini player
   miniWindow.loadFile('mini.html');
+  
+  // Hover state for the mini player UI. :hover is lost over -webkit-app-region: drag areas,
+  // so the main process tracks the cursor and tells the renderer when it is inside the window.
+  let lastInside = null;
+  const hoverTimer = setInterval(() => {
+    if (!miniWindow || miniWindow.isDestroyed()) return clearInterval(hoverTimer);
+    const p = screen.getCursorScreenPoint();
+    const b = miniWindow.getBounds();
+    const inside = p.x >= b.x && p.x < b.x + b.width && p.y >= b.y && p.y < b.y + b.height;
+    if (inside !== lastInside) {
+      lastInside = inside;
+      miniWindow.webContents.send('mini-hover', inside);
+    }
+  }, 80);
+  // Re-send the state once the page has loaded (the first message could arrive too early)
+  miniWindow.webContents.on('did-finish-load', () => { lastInside = null; });
 
   miniWindow.on('closed', () => {
+	clearInterval(hoverTimer);
     miniWindow = null;
     // Avvisa la finestra principale che il mini player è stato chiuso
     if (mainWindow) mainWindow.webContents.send('mini-closed');
